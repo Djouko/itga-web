@@ -1,0 +1,508 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── ITGA Layout Variables ─── */
+:root {
+  --sidebar-width: 220px;
+  --right-panel-width: 260px;
+  --topbar-height: 44px;
+  --feed-max-width: 555px;
+  --content-padding: 12px;
+
+  /* RGB channels for Tailwind opacity modifiers (bg-primary/10 etc.) */
+  --rgb-text-main: 27 40 56;
+  --rgb-text-dark: 74 85 104;
+  --rgb-text-light: 138 149 165;
+  --rgb-icon-light: 174 184 196;
+  --rgb-bg-light: 240 244 248;
+  --rgb-bg: 238 243 248;
+  --rgb-bg-dark: 26 26 46;
+  --rgb-card: 255 255 255;
+  --rgb-border: 226 232 240;
+  --rgb-border-light: 241 245 249;
+}
+
+/* Dark mode RGB channels */
+.dark {
+  --rgb-text-main: 226 232 240;
+  --rgb-text-dark: 160 174 192;
+  --rgb-text-light: 130 140 160;
+  --rgb-icon-light: 130 140 160;
+  --rgb-bg-light: 37 40 55;
+  --rgb-bg: 15 17 23;
+  --rgb-bg-dark: 30 33 48;
+  --rgb-card: 30 33 48;
+  --rgb-border: 45 55 72;
+  --rgb-border-light: 37 40 55;
+}
+
+body {
+  background: rgb(var(--rgb-bg));
+  color: rgb(var(--rgb-text-main));
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-size: 14px;
+}
+
+html {
+  font-size: 14px;
+  scroll-behavior: smooth;
+}
+
+/* ─── NProgress bar colour override ─── */
+#nprogress .bar {
+  background: #2AABAB !important;
+  height: 3px !important;
+}
+#nprogress .peg {
+  box-shadow: 0 0 10px #2AABAB, 0 0 5px #2AABAB !important;
+}
+
+/* ─── LinkedIn-style Card System ─── */
+@layer components {
+  .card {
+    background: rgb(var(--rgb-card));
+    @apply rounded-lg border border-border/10 shadow-[0_0_0_1px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.06)];
+  }
+  .dark .card {
+    @apply shadow-[0_0_0_1px_rgba(255,255,255,0.04),0_1px_2px_rgba(0,0,0,0.3)];
+  }
+  .card-hover {
+    @apply card transition-shadow duration-200 hover:shadow-[0_0_0_1px_rgba(0,0,0,0.08),0_4px_12px_rgba(0,0,0,0.1)];
+  }
+  .dark .card-hover {
+    @apply hover:shadow-[0_0_0_1px_rgba(255,255,255,0.06),0_4px_12px_rgba(0,0,0,0.3)];
+  }
+  .card-elevated {
+    background: rgb(var(--rgb-card));
+    @apply rounded-lg shadow-[0_4px_12px_rgba(0,0,0,0.08),0_0_0_1px_rgba(0,0,0,0.04)];
+  }
+  .dark .card-elevated {
+    background: rgb(37 40 55);
+    @apply shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_0_1px_rgba(255,255,255,0.06)];
+  }
+  /* ─── Interactive Card with hover lift ─── */
+  .card-interactive {
+    background: rgb(var(--rgb-card));
+    @apply rounded-lg border border-border/10 shadow-[0_0_0_1px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.06)] transition-all duration-300 ease-out;
+  }
+  .card-interactive:hover {
+    @apply shadow-[0_0_0_1px_rgba(0,0,0,0.06),0_4px_16px_rgba(0,0,0,0.08)] -translate-y-[1px];
+  }
+  .dark .card-interactive {
+    @apply shadow-[0_0_0_1px_rgba(255,255,255,0.04),0_1px_2px_rgba(0,0,0,0.3)];
+  }
+  .dark .card-interactive:hover {
+    @apply shadow-[0_0_0_1px_rgba(255,255,255,0.08),0_4px_16px_rgba(0,0,0,0.5)];
+  }
+}
+
+/* ─── Glass header for sticky bars ─── */
+.glass-header {
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+}
+.dark .glass-header {
+  background: rgba(30, 33, 48, 0.85);
+}
+
+/* ─── Premium focus ring ─── */
+.focus-ring {
+  @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:ring-offset-1;
+}
+
+/* ─── Subtle text gradient accent ─── */
+.text-gradient-primary {
+  background: linear-gradient(135deg, #2AABAB, #5DCCC6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ─── Premium hover underline ─── */
+.hover-underline {
+  position: relative;
+}
+.hover-underline::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #2AABAB, #5DCCC6);
+  border-radius: 1px;
+  transition: width 0.3s ease;
+}
+.hover-underline:hover::after {
+  width: 100%;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #C1CDD7;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #8A95A5;
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: #3A3F50;
+}
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #4A5060;
+}
+
+/* Hide scrollbar utility */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Safe area for mobile bottom nav */
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* ─── Premium Animations ─── */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes pulse-soft {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+@keyframes bounce-in {
+  0% { opacity: 0; transform: scale(0.3); }
+  50% { transform: scale(1.05); }
+  70% { transform: scale(0.95); }
+  100% { opacity: 1; transform: scale(1); }
+}
+.animate-fadeIn {
+  animation: fadeIn 0.35s ease-out;
+}
+.animate-slideUp {
+  animation: slideUp 0.45s ease-out;
+}
+.animate-scaleIn {
+  animation: scaleIn 0.25s ease-out;
+}
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-slideDown {
+  animation: slideDown 0.4s ease-out;
+}
+.animate-shimmer {
+  background: linear-gradient(90deg, #F0F4F8 25%, #E2E8F0 50%, #F0F4F8 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+.dark .animate-shimmer {
+  background: linear-gradient(90deg, #1E2130 25%, #252837 50%, #1E2130 75%);
+  background-size: 200% 100%;
+}
+.animate-slideInRight {
+  animation: slideInRight 0.3s ease-out;
+}
+.animate-slideInLeft {
+  animation: slideInLeft 0.3s ease-out;
+}
+.animate-bounce-in {
+  animation: bounce-in 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* Staggered children animation */
+.stagger-children > * {
+  opacity: 0;
+  animation: slideUp 0.4s ease-out forwards;
+}
+.stagger-children > *:nth-child(1) { animation-delay: 0.03s; }
+.stagger-children > *:nth-child(2) { animation-delay: 0.06s; }
+.stagger-children > *:nth-child(3) { animation-delay: 0.09s; }
+.stagger-children > *:nth-child(4) { animation-delay: 0.12s; }
+.stagger-children > *:nth-child(5) { animation-delay: 0.15s; }
+.stagger-children > *:nth-child(6) { animation-delay: 0.18s; }
+.stagger-children > *:nth-child(7) { animation-delay: 0.21s; }
+.stagger-children > *:nth-child(8) { animation-delay: 0.24s; }
+.stagger-children > *:nth-child(9) { animation-delay: 0.27s; }
+.stagger-children > *:nth-child(10) { animation-delay: 0.30s; }
+
+/* Glass effect utility */
+.glass {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+}
+.dark .glass {
+  background: rgba(30, 33, 48, 0.82);
+}
+.glass-dark {
+  background: rgba(13, 17, 23, 0.88);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+}
+
+/* Skeleton loader */
+.skeleton {
+  @apply rounded-lg animate-shimmer;
+}
+
+/* Like button pop animation */
+@keyframes like-pop {
+  0% { transform: scale(1); }
+  15% { transform: scale(0.85); }
+  40% { transform: scale(1.15); }
+  60% { transform: scale(0.95); }
+  80% { transform: scale(1.02); }
+  100% { transform: scale(1); }
+}
+.animate-like-pop {
+  animation: like-pop 0.45s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* Notification dot pulse */
+@keyframes dot-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(198, 33, 104, 0.4); }
+  50% { box-shadow: 0 0 0 6px rgba(198, 33, 104, 0); }
+}
+.animate-dot-pulse {
+  animation: dot-pulse 2s ease-in-out infinite;
+}
+
+/* Smooth number transition */
+@keyframes number-pop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+.animate-number-pop {
+  animation: number-pop 0.3s ease-out;
+}
+
+/* Heart like bounce animation */
+@keyframes heart-bounce {
+  0% { transform: scale(1); }
+  25% { transform: scale(1.3); }
+  50% { transform: scale(0.9); }
+  75% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+.animate-heart-bounce {
+  animation: heart-bounce 0.35s ease-in-out;
+}
+
+/* Counter change animation */
+@keyframes count-up {
+  0% { opacity: 0; transform: translateY(6px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+.animate-count {
+  animation: count-up 0.25s ease-out;
+}
+
+/* ─── Conference / Spaces speaking ring ─── */
+/* Uses gradient background visible in 4px gap between ring-div and avatar-div.
+   This approach never overflows any parent (overflow-safe). */
+.speaks-ring {
+  background: conic-gradient(
+    from 0deg,
+    rgba(42, 171, 171, 0.95),
+    rgba(93, 204, 198, 1),
+    rgba(42, 171, 171, 0.95)
+  );
+  animation: speaksRingPulse 0.85s ease-in-out infinite;
+}
+@keyframes speaksRingPulse {
+  0%, 100% { opacity: 0.75; }
+  50%       { opacity: 1; box-shadow: 0 0 18px rgba(42, 171, 171, 0.55); }
+}
+
+/* ─── Audio wave bars (speaking indicator in tile name bar) ─── */
+@keyframes audioWave1 {
+  0%, 100% { height: 30%; }
+  50%       { height: 85%; }
+}
+@keyframes audioWave2 {
+  0%, 100% { height: 100%; }
+  50%       { height: 35%; }
+}
+@keyframes audioWave3 {
+  0%, 100% { height: 55%; }
+  50%       { height: 100%; }
+}
+
+/* ─── Video container utilities (Agora inserts video/div at runtime) ─── */
+/* video-fill: camera tile — covers ALL Agora-injected wrapper layers with wildcard */
+.video-fill {
+  position: relative;
+}
+.video-fill * {
+  width: 100% !important;
+  height: 100% !important;
+  background: transparent !important;
+}
+.video-fill video {
+  object-fit: cover !important;
+  background: #0d1f35 !important;
+  display: block;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+}
+/* video-contain: used for screen share. Explicit height is set inline.
+   object-fit: contain preserves full screen content (letterbox with navy bg). */
+.video-contain {
+  background: #0d2140;
+  position: relative;
+}
+.video-contain * {
+  width: 100% !important;
+  height: 100% !important;
+  background: transparent !important;
+}
+.video-contain video {
+  object-fit: contain !important;
+  background: #0d2140 !important;
+  display: block;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+}
+
+/* ─── Futuristic Auth 3D Motion ─── */
+@keyframes authFloat {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(0, -14px, 0); }
+}
+@keyframes authFloatReverse {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(0, 12px, 0); }
+}
+@keyframes authDrift {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  33% { transform: translate3d(10px, -8px, 0) rotate(2deg); }
+  66% { transform: translate3d(-8px, 6px, 0) rotate(-2deg); }
+}
+@keyframes authGlow {
+  0%, 100% { opacity: 0.45; }
+  50% { opacity: 0.95; }
+}
+@keyframes authRingSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+@keyframes authCubeSpin {
+  0% { transform: rotateX(-22deg) rotateY(0deg); }
+  100% { transform: rotateX(-22deg) rotateY(360deg); }
+}
+@keyframes authPanelTilt {
+  0%, 100% { transform: perspective(1200px) rotateX(0deg) rotateY(0deg); }
+  50% { transform: perspective(1200px) rotateX(1.2deg) rotateY(-1.4deg); }
+}
+@keyframes authCardEnter {
+  0% { opacity: 0; transform: translateY(16px) scale(0.97); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes authPulseShadow {
+  0%, 100% { opacity: 0.32; transform: translateX(-50%) scale(0.98); }
+  50% { opacity: 0.62; transform: translateX(-50%) scale(1.04); }
+}
+
+.auth-motion-float {
+  animation: authFloat 6s ease-in-out infinite;
+}
+.auth-motion-float-slow {
+  animation: authFloat 9s ease-in-out infinite;
+}
+.auth-motion-float-reverse {
+  animation: authFloatReverse 7.2s ease-in-out infinite;
+}
+.auth-motion-drift {
+  animation: authDrift 13s ease-in-out infinite;
+}
+.auth-motion-glow {
+  animation: authGlow 4.8s ease-in-out infinite;
+}
+.auth-ring-spin {
+  animation: authRingSpin 16s linear infinite;
+}
+.auth-cube-spin {
+  transform-style: preserve-3d;
+  animation: authCubeSpin 11.5s linear infinite;
+}
+.auth-tilt-panel {
+  transform-style: preserve-3d;
+  animation: authPanelTilt 8s ease-in-out infinite;
+}
+.auth-card-enter {
+  animation: authCardEnter 0.7s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+.auth-shadow-pulse {
+  animation: authPulseShadow 5.2s ease-in-out infinite;
+}
+
+.auth-cube-face {
+  position: absolute;
+  inset: 0;
+  border-radius: 0.72rem;
+  border: 1px solid rgba(255, 255, 255, 0.36);
+  background: linear-gradient(145deg, rgba(93, 204, 198, 0.5), rgba(42, 171, 171, 0.14));
+  box-shadow: inset 0 0 18px rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(2px);
+}
+.auth-cube-front { transform: translateZ(30px); }
+.auth-cube-back { transform: rotateY(180deg) translateZ(30px); }
+.auth-cube-right { transform: rotateY(90deg) translateZ(30px); }
+.auth-cube-left { transform: rotateY(-90deg) translateZ(30px); }
+.auth-cube-top { transform: rotateX(90deg) translateZ(30px); }
+.auth-cube-bottom { transform: rotateX(-90deg) translateZ(30px); }
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-motion-float,
+  .auth-motion-float-slow,
+  .auth-motion-float-reverse,
+  .auth-motion-drift,
+  .auth-motion-glow,
+  .auth-ring-spin,
+  .auth-cube-spin,
+  .auth-tilt-panel,
+  .auth-card-enter,
+  .auth-shadow-pulse {
+    animation: none !important;
+  }
+}
