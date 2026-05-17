@@ -21,6 +21,12 @@ export function MentionProfileLink({ username, children, className }: MentionPro
 
   const openMention = async (event: MouseEvent<HTMLAnchorElement>) => {
     event.preventDefault();
+    const companyMatch = cleanUsername.match(/^company-(\d+)$/i);
+    if (companyMatch?.[1]) {
+      router.push(`/company/${companyMatch[1]}`);
+      return;
+    }
+
     if (!cleanUsername || !user) {
       router.push(fallbackHref);
       return;
@@ -33,6 +39,10 @@ export function MentionProfileLink({ username, children, className }: MentionPro
         (candidate) => candidate.username?.toLowerCase() === cleanUsername.toLowerCase()
       );
       const target = exact ?? users[0];
+      if (target?.profile_type === "company" && target.owned_company?.id) {
+        router.push(`/company/${target.owned_company.id}`);
+        return;
+      }
       router.push(target?.id ? `/profile/${target.id}` : fallbackHref);
     } catch {
       router.push(fallbackHref);

@@ -5,9 +5,9 @@
 /* ─── ITGA Layout Variables ─── */
 :root {
   --sidebar-width: 220px;
-  --right-panel-width: 260px;
+  --right-panel-width: 320px;
   --topbar-height: 44px;
-  --feed-max-width: 555px;
+  --feed-max-width: 620px;
   --content-padding: 12px;
 
   /* RGB channels for Tailwind opacity modifiers (bg-primary/10 etc.) */
