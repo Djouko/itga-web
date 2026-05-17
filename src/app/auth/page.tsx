@@ -63,6 +63,8 @@ function firebaseErrorToFrench(error: unknown): string {
       return "";
     case "auth/popup-blocked":
       return "Le popup de connexion a été bloqué. Autorisez les popups pour ce site.";
+    case "auth/unauthorized-domain":
+      return "Ce domaine web n'est pas autorise dans Firebase Authentication. Ajoutez le domaine actuel dans Firebase Console > Authentication > Settings > Authorized domains.";
     case "auth/account-exists-with-different-credential":
       return "Un compte existe avec cet email mais via un autre mode de connexion.";
     case "auth/user-disabled":
