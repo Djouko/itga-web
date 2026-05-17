@@ -235,7 +235,10 @@ export function Sidebar() {
               />
               <span className="flex-1">{label}</span>
               {item.href === "/notifications" && notifCount > 0 && (
-                <span className="w-4.5 h-4.5 rounded-full bg-magenta text-white text-[9px] font-bold flex items-center justify-center animate-dot-pulse">
+                <span
+                  className="inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-gradient-to-r from-magenta to-red px-1.5 text-[10px] font-black leading-none text-white shadow-[0_0_0_3px_rgba(198,33,104,0.14)] ring-1 ring-white/20"
+                  aria-label={`${notifCount} notification${notifCount > 1 ? "s" : ""} non lue${notifCount > 1 ? "s" : ""}`}
+                >
                   {notifCount > 99 ? "99+" : notifCount}
                 </span>
               )}

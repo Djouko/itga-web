@@ -3,13 +3,14 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { TrendingUp, UserPlus } from "lucide-react";
+import { Briefcase, MapPin, Sparkles, TrendingUp, UserPlus } from "lucide-react";
 import { Avatar } from "@/components/ui/avatar";
 import { useAuthStore } from "@/lib/store";
 import { PostService } from "@/lib/services/post-service";
 import { UserService } from "@/lib/services/user-service";
+import { JobService } from "@/lib/services/job-service";
 import { getActingCompanyId } from "@/lib/company-acting";
-import type { User } from "@/lib/types";
+import type { JobOffer, User } from "@/lib/types";
 import { addBaseURL } from "@/lib/utils";
 
 interface HashtagResult {
@@ -28,8 +29,10 @@ export function RightPanel() {
   const { user: me } = useAuthStore();
   const [hashtags, setHashtags] = useState<HashtagResult[]>([]);
   const [suggestions, setSuggestions] = useState<User[]>([]);
+  const [jobSuggestions, setJobSuggestions] = useState<JobOffer[]>([]);
   const [loadingTrends, setLoadingTrends] = useState(true);
   const [loadingSuggestions, setLoadingSuggestions] = useState(true);
+  const [loadingJobs, setLoadingJobs] = useState(true);
 
   useEffect(() => {
     if (!me) return;
@@ -78,6 +81,20 @@ export function RightPanel() {
       setLoadingSuggestions(false);
     };
     fetchSuggestions();
+
+    JobService.fetchJobs({
+      user_id: me.id,
+      start: 0,
+      limit: 3,
+      sort_by: "relevance",
+    })
+      .then((res) => {
+        if (res.status && Array.isArray(res.data)) {
+          setJobSuggestions(res.data.slice(0, 3));
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoadingJobs(false));
   }, [me]);
 
   const handleFollow = async (userId: number) => {
@@ -198,6 +215,69 @@ export function RightPanel() {
         </div>
         <Link href="/search" className="block text-center py-2.5 text-[13px] font-semibold text-primary hover:bg-bg-light/40 transition-all duration-200 border-t border-border/20">
           Voir plus
+        </Link>
+      </div>
+
+      {/* Job Suggestions Card */}
+      <div className="card overflow-hidden">
+        <div className="flex items-center gap-2 px-4 pt-3 pb-2">
+          <div className="w-6 h-6 rounded-lg bg-cyan/10 flex items-center justify-center">
+            <Briefcase size={13} className="text-cyan" />
+          </div>
+          <h3 className="text-sm font-bold text-text-main">Jobs recommandés</h3>
+        </div>
+        <div>
+          {loadingJobs ? (
+            <div className="px-4 py-3 space-y-3">
+              {[1,2,3].map(i => (
+                <div key={i} className="space-y-1.5">
+                  <div className="h-3.5 w-32 rounded skeleton" />
+                  <div className="h-2.5 w-24 rounded skeleton" />
+                </div>
+              ))}
+            </div>
+          ) : jobSuggestions.length === 0 ? (
+            <p className="text-[12px] text-text-light text-center py-6">Aucune offre pour le moment</p>
+          ) : (
+            jobSuggestions.map((job) => (
+              <Link
+                key={job.id}
+                href={`/jobs/${job.id}`}
+                className="block px-4 py-2.5 hover:bg-bg-light/50 transition-all duration-200 group"
+              >
+                <div className="flex items-start gap-2.5">
+                  <div className="mt-0.5 h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center overflow-hidden shrink-0">
+                    {job.company?.logo ? (
+                      <img src={addBaseURL(job.company.logo) ?? ""} alt="" className="h-full w-full object-cover" />
+                    ) : (
+                      <Briefcase size={15} className="text-primary" />
+                    )}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[12px] font-bold text-text-main group-hover:text-primary truncate">{job.title}</p>
+                    <p className="text-[11px] text-text-light truncate">{job.company?.name ?? "Entreprise ITGA"}</p>
+                    <div className="mt-1 flex items-center gap-2 text-[10px] text-text-light">
+                      {job.location_city && (
+                        <span className="inline-flex min-w-0 items-center gap-0.5 truncate">
+                          <MapPin size={10} />
+                          <span className="truncate">{job.location_city}</span>
+                        </span>
+                      )}
+                      {job.is_match === 1 && (
+                        <span className="inline-flex items-center gap-0.5 text-magenta font-bold">
+                          <Sparkles size={10} />
+                          {job.match_score}%
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            ))
+          )}
+        </div>
+        <Link href="/jobs" className="block text-center py-2.5 text-[13px] font-semibold text-primary hover:bg-bg-light/40 transition-all duration-200 border-t border-border/20">
+          Voir les offres
         </Link>
       </div>
 

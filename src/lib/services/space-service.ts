@@ -272,9 +272,9 @@ export const SpaceService = {
   },
 
   /** Send push notification to a user via FCM proxy (JSON body required by backend).
-   *  Video calls (type '20'): data-only message (no notification key) so Android
-   *  delivers it to the background handler even when the app is killed — matching
-   *  the mobile Flutter pattern for CallKit/incoming call screens. */
+   *  Video calls (type '20'): Android stays data-only so the background handler
+   *  can show CallKit. iOS receives an APNs alert fallback because PushKit/VoIP
+   *  entitlement is not configured in the current iOS project. */
   async sendPushNotification(
     deviceToken: string,
     deviceType: number | undefined,
@@ -300,10 +300,17 @@ export const SpaceService = {
     };
 
     if (isVideoCall) {
-      // Data-only message — no "notification" key so Android delivers to data handler
+      // Android data-only; iOS alert fallback so calls are visible without PushKit.
       messageData.apns = {
-        payload: { aps: { "content-available": 1 } },
-        headers: { "apns-push-type": "voip", "apns-priority": "10" },
+        payload: {
+          aps: {
+            "content-available": 1,
+            alert: { title, body },
+            badge: 1,
+            sound: "default",
+          },
+        },
+        headers: { "apns-push-type": "alert", "apns-priority": "10" },
       };
     } else {
       // Standard notification with system tray display

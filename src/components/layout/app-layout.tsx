@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Building2, LayoutDashboard, X } from "lucide-react";
 import { Sidebar } from "./sidebar";
@@ -17,6 +18,7 @@ interface AppLayoutProps {
 }
 
 export function AppLayout({ children }: AppLayoutProps) {
+  const pathname = usePathname();
   const [actingCompanyId, setActingCompanyId] = useState<number | null>(null);
   const [company, setCompany] = useState<Company | null>(null);
 
@@ -36,6 +38,10 @@ export function AppLayout({ children }: AppLayoutProps) {
 
   const isActingCompany = actingCompanyId !== null && company?.id === actingCompanyId;
   const companyLogo = addBaseURL(company?.logo);
+  const useWideContent =
+    pathname.startsWith("/jobs") ||
+    pathname.startsWith("/company") ||
+    pathname.startsWith("/search");
 
   return (
     <div className="min-h-screen">
@@ -92,9 +98,9 @@ export function AppLayout({ children }: AppLayoutProps) {
 
       {/* Main Content — LinkedIn-style centered with gap */}
       <main className="lg:ml-[var(--sidebar-width)] min-h-screen pb-20 lg:pb-0">
-        <div className="max-w-[980px] mx-auto flex gap-4 px-3 lg:px-4 pt-3">
+        <div className="max-w-[1240px] mx-auto flex gap-4 px-3 lg:px-4 pt-3">
           {/* Center Feed Column */}
-          <div className="flex-1 min-w-0 max-w-[var(--feed-max-width)]">
+          <div className={useWideContent ? "flex-1 min-w-0 max-w-[760px]" : "flex-1 min-w-0 max-w-[var(--feed-max-width)]"}>
             {children}
           </div>
 

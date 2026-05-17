@@ -26,6 +26,7 @@ import {
   VolumeX,
 } from "lucide-react";
 import { Avatar, VerifyBadge } from "@/components/ui/avatar";
+import { MentionProfileLink } from "@/components/text/mention-profile-link";
 import { useAuthStore, useSettingsStore, useTranslation } from "@/lib/store";
 import { ReelService } from "@/lib/services/reel-service";
 import { UserService } from "@/lib/services/user-service";
@@ -953,13 +954,13 @@ function ReelDescription({ text }: { text: string }) {
             {part.text}
           </Link>
         ) : (
-          <Link
+          <MentionProfileLink
             key={i}
-            href={`/search?q=${encodeURIComponent(part.text.replace(/^@/, ""))}`}
-            className="text-primary font-medium hover:underline"
+            username={part.text.replace(/^@/, "")}
+            className="text-primary"
           >
             {part.text}
-          </Link>
+          </MentionProfileLink>
         ),
       )}
       {isLong && (
@@ -999,7 +1000,7 @@ function CommentText({ text, className }: { text: string; className?: string }) 
         ) : p.type === "hashtag" ? (
           <Link key={i} href={`/tag?tag=${encodeURIComponent(p.text.slice(1))}&tab=reels`} className="text-primary font-medium hover:underline">{p.text}</Link>
         ) : (
-          <Link key={i} href={`/search?q=${encodeURIComponent(p.text.replace(/^@/, ""))}`} className="text-primary font-medium hover:underline">{p.text}</Link>
+          <MentionProfileLink key={i} username={p.text.replace(/^@/, "")} className="text-primary">{p.text}</MentionProfileLink>
         ),
       )}
     </p>

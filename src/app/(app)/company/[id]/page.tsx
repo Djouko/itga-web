@@ -1,41 +1,50 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import Link from "next/link";
 import {
   ArrowLeft,
-  Building2,
-  MapPin,
-  Globe,
-  Users,
   Briefcase,
-  Leaf,
-  ExternalLink,
-  CheckCircle2,
-  Clock,
+  Building2,
   ChevronRight,
-  UserPlus,
-  UserCheck,
+  Clock,
+  Globe,
+  Leaf,
+  MapPin,
   Settings,
+  ShieldCheck,
+  UserCheck,
+  UserPlus,
+  Users,
 } from "lucide-react";
+import { Avatar, VerifyBadge } from "@/components/ui/avatar";
 import { useAuthStore } from "@/lib/store";
 import { CompanyService } from "@/lib/services/company-service";
 import { getActingCompanyId } from "@/lib/company-acting";
-import { addBaseURL, formatTimeAgo, cn } from "@/lib/utils";
-import type { Company, JobOffer, ContractType, LocationType, Post } from "@/lib/types";
+import { addBaseURL, cn, formatTimeAgo } from "@/lib/utils";
+import type { Company, ContractType, JobOffer, LocationType, Post } from "@/lib/types";
 
 const CONTRACT_LABELS: Record<ContractType, string> = {
-  stage: "Stage", alternance: "Alternance", cdi: "CDI", cdd: "CDD", freelance: "Freelance",
+  stage: "Stage",
+  alternance: "Alternance",
+  cdi: "CDI",
+  cdd: "CDD",
+  freelance: "Freelance",
 };
+
 const LOCATION_LABELS: Record<LocationType, string> = {
-  remote: "Remote", hybrid: "Hybride", onsite: "Sur site",
+  remote: "Remote",
+  hybrid: "Hybride",
+  onsite: "Sur site",
 };
-const CONTRACT_COLORS: Record<ContractType, { text: string; bg: string; border: string }> = {
-  cdi:        { text: "#10b981", bg: "rgba(16,185,129,0.1)",  border: "rgba(16,185,129,0.25)" },
-  cdd:        { text: "#f59e0b", bg: "rgba(245,158,11,0.1)",  border: "rgba(245,158,11,0.25)" },
-  stage:      { text: "#60a5fa", bg: "rgba(96,165,250,0.1)",  border: "rgba(96,165,250,0.25)" },
-  alternance: { text: "#a78bfa", bg: "rgba(167,139,250,0.1)", border: "rgba(167,139,250,0.25)" },
-  freelance:  { text: "#00c4d4", bg: "rgba(0,196,212,0.1)",   border: "rgba(0,196,212,0.25)" },
+
+const CONTRACT_COLORS: Record<ContractType, string> = {
+  stage: "bg-blue-500/10 text-blue-500 border-blue-500/20",
+  alternance: "bg-purple-500/10 text-purple-500 border-purple-500/20",
+  cdi: "bg-green-500/10 text-green-500 border-green-500/20",
+  cdd: "bg-orange/10 text-orange border-orange/20",
+  freelance: "bg-cyan/10 text-cyan border-cyan/20",
 };
 
 export default function CompanyPublicProfilePage() {
@@ -52,21 +61,7 @@ export default function CompanyPublicProfilePage() {
   const [following, setFollowing] = useState(false);
   const [followersCount, setFollowersCount] = useState(0);
   const [followLoading, setFollowLoading] = useState(false);
-  const [isOwner, setIsOwner] = useState(false);
   const loadingMore = useRef(false);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    try {
-      const raw = window.localStorage.getItem("itga-company");
-      if (raw) {
-        const ownCompany = JSON.parse(raw) as { id?: number };
-        if (ownCompany?.id === companyId) setIsOwner(true);
-      }
-    } catch {
-      /* ignore */
-    }
-  }, [companyId]);
 
   const load = useCallback(
     async (start: number, reset = false) => {
@@ -80,6 +75,7 @@ export default function CompanyPublicProfilePage() {
           10,
           getActingCompanyId() ?? undefined
         );
+
         if (res.status && res.data) {
           if (reset) {
             setCompany(res.data.company);
@@ -104,8 +100,11 @@ export default function CompanyPublicProfilePage() {
     load(0, true);
   }, [load]);
 
+  const isOwner = Boolean(user?.id && company?.owner_user_id === user.id) || getActingCompanyId() === companyId;
+  const isCertified = company?.is_verified === 1;
+
   const handleFollow = async () => {
-    if (!user || followLoading) return;
+    if (!user || followLoading || isOwner) return;
     setFollowLoading(true);
     try {
       const res = following
@@ -122,10 +121,10 @@ export default function CompanyPublicProfilePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: "#030a14" }}>
+      <div className="card flex min-h-[360px] items-center justify-center">
         <div className="flex flex-col items-center gap-3">
-          <div className="w-8 h-8 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: "#00c4d4", borderTopColor: "transparent" }} />
-          <span className="text-sm" style={{ color: "rgba(255,255,255,0.4)" }}>Chargement du profil…</span>
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+          <span className="text-sm text-text-light">Chargement du profil...</span>
         </div>
       </div>
     );
@@ -133,10 +132,10 @@ export default function CompanyPublicProfilePage() {
 
   if (!company) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center gap-4" style={{ background: "#030a14" }}>
-        <Building2 size={48} style={{ color: "rgba(255,255,255,0.1)" }} />
-        <p style={{ color: "rgba(255,255,255,0.4)" }}>Entreprise introuvable.</p>
-        <button onClick={() => router.back()} className="px-4 py-2 rounded-xl text-sm font-medium" style={{ background: "rgba(0,196,212,0.1)", color: "#00c4d4", border: "1px solid rgba(0,196,212,0.2)" }}>
+      <div className="card flex min-h-[360px] flex-col items-center justify-center gap-4 text-center">
+        <Building2 size={44} className="text-text-light/30" />
+        <p className="font-semibold text-text-main">Entreprise introuvable.</p>
+        <button onClick={() => router.back()} className="rounded-full bg-primary px-4 py-2 text-sm font-bold text-white">
           Retour
         </button>
       </div>
@@ -144,289 +143,241 @@ export default function CompanyPublicProfilePage() {
   }
 
   const logo = addBaseURL(company.logo);
-  const initial = company.name?.[0]?.toUpperCase() ?? "E";
+  const location = [company.city, company.country].filter(Boolean).join(", ");
 
   return (
-    <div className="min-h-screen pb-20" style={{ background: "#030a14" }}>
-
-      {/* ─── Sticky Top Bar ─── */}
-      <header
-        className="sticky top-0 z-30 flex items-center gap-3 px-4 py-3"
-        style={{ background: "rgba(3,10,20,0.92)", backdropFilter: "blur(20px)", borderBottom: "1px solid rgba(255,255,255,0.07)" }}
-      >
-        <button onClick={() => router.back()} className="w-8 h-8 rounded-xl flex items-center justify-center transition-colors cursor-pointer" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)" }}>
-          <ArrowLeft size={16} style={{ color: "rgba(255,255,255,0.6)" }} />
-        </button>
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-bold text-white truncate">{company.name}</p>
-          {company.sector && <p className="text-[10px] truncate" style={{ color: "rgba(255,255,255,0.35)" }}>{company.sector}</p>}
+    <div className="animate-fadeIn space-y-4 pb-10">
+      <header className="glass-header sticky top-0 z-20 -mx-3 border-b border-border/30 px-3 py-2 lg:-mx-4 lg:px-4">
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => router.back()}
+            className="flex h-9 w-9 items-center justify-center rounded-full text-text-light transition-colors hover:bg-bg-light hover:text-text-main"
+            aria-label="Retour"
+          >
+            <ArrowLeft size={18} />
+          </button>
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-1.5">
+              <p className="truncate text-sm font-black text-text-main">{company.name}</p>
+              {isCertified && <VerifyBadge size={14} />}
+            </div>
+            <p className="truncate text-[11px] text-text-light">{company.sector ?? "Entreprise ITGA"}</p>
+          </div>
+          {isOwner ? (
+            <Link
+              href="/company/dashboard"
+              className="inline-flex items-center gap-1.5 rounded-full border border-primary/25 bg-primary/10 px-3 py-1.5 text-xs font-bold text-primary"
+            >
+              <Settings size={13} />
+              Gerer
+            </Link>
+          ) : (
+            <button
+              onClick={handleFollow}
+              disabled={followLoading}
+              className={cn(
+                "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold transition-all",
+                following
+                  ? "border border-primary/25 bg-primary/10 text-primary"
+                  : "bg-gradient-to-r from-primary to-cyan text-white shadow-sm shadow-primary/20",
+                followLoading && "opacity-60"
+              )}
+            >
+              {following ? <UserCheck size={13} /> : <UserPlus size={13} />}
+              {following ? "Abonne" : "Suivre"}
+            </button>
+          )}
         </div>
-        {isOwner ? (
-          <button
-            onClick={() => router.push("/company/dashboard")}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold cursor-pointer transition-all"
-            style={{ background: "rgba(0,196,212,0.12)", color: "#00c4d4", border: "1px solid rgba(0,196,212,0.3)" }}
-          >
-            <Settings size={13} />
-            Gérer ma page
-          </button>
-        ) : user ? (
-          <button
-            onClick={handleFollow}
-            disabled={followLoading}
-            className={cn("flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer", followLoading && "opacity-60")}
-            style={
-              following
-                ? { background: "rgba(0,196,212,0.12)", color: "#00c4d4", border: "1px solid rgba(0,196,212,0.3)" }
-                : { background: "linear-gradient(135deg, #00c4d4, #7b2fff)", color: "#fff", border: "none" }
-            }
-          >
-            {following ? <UserCheck size={13} /> : <UserPlus size={13} />}
-            {following ? "Abonné" : "Suivre"}
-          </button>
-        ) : null}
       </header>
 
-      <div className="max-w-2xl mx-auto px-4 pt-5 space-y-4">
-
-        {/* ─── Hero Card ─── */}
-        <div
-          className="rounded-2xl overflow-hidden"
-          style={{ background: "#0d1525", border: "1px solid rgba(255,255,255,0.08)" }}
-        >
-          {/* Banner */}
-          <div className="h-24 relative" style={{ background: "linear-gradient(135deg, rgba(0,196,212,0.2), rgba(123,47,255,0.2), rgba(255,107,172,0.1))" }}>
-            <div className="absolute inset-0" style={{ background: "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")" }} />
-          </div>
-
-          <div className="px-5 pb-5">
-            {/* Logo + Verified */}
-            <div className="flex items-end justify-between -mt-8 mb-4">
-              <div
-                className="w-16 h-16 rounded-2xl overflow-hidden flex items-center justify-center text-2xl font-bold shadow-xl"
-                style={{ background: logo ? "transparent" : "linear-gradient(135deg, rgba(0,196,212,0.3), rgba(123,47,255,0.2))", border: "3px solid #0d1525" }}
-              >
-                {logo ? (
-                  <img src={logo} alt={company.name} className="w-full h-full object-cover" />
-                ) : (
-                  <span style={{ color: "#00c4d4" }}>{initial}</span>
-                )}
-              </div>
-
-              {/* Mobile action button */}
-              {isOwner ? (
-                <button
-                  onClick={() => router.push("/company/dashboard")}
-                  className="sm:hidden flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold cursor-pointer"
-                  style={{ background: "rgba(0,196,212,0.1)", color: "#00c4d4", border: "1px solid rgba(0,196,212,0.25)" }}
-                >
-                  <Settings size={13} />
-                  Gérer
-                </button>
-              ) : user ? (
-                <button
-                  onClick={handleFollow}
-                  disabled={followLoading}
-                  className={cn("sm:hidden flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold cursor-pointer", followLoading && "opacity-60")}
-                  style={
-                    following
-                      ? { background: "rgba(0,196,212,0.1)", color: "#00c4d4", border: "1px solid rgba(0,196,212,0.25)" }
-                      : { background: "linear-gradient(135deg, #00c4d4, #7b2fff)", color: "#fff" }
-                  }
-                >
-                  {following ? <UserCheck size={13} /> : <UserPlus size={13} />}
-                  {following ? "Abonné" : "Suivre"}
-                </button>
-              ) : null}
+      <section className="card overflow-hidden">
+        <div className="relative h-32 bg-gradient-to-br from-primary/25 via-cyan/15 to-magenta/10">
+          <div className="absolute inset-0 opacity-40 [background-image:radial-gradient(circle_at_1px_1px,rgba(255,255,255,.5)_1px,transparent_0)] [background-size:24px_24px]" />
+        </div>
+        <div className="px-5 pb-5">
+          <div className="-mt-12 flex items-end justify-between gap-4">
+            <div className="rounded-2xl bg-card p-1 shadow-sm ring-1 ring-border/40">
+              <Avatar src={logo} alt={company.name} size={84} className="rounded-2xl" isVerified={isCertified} />
             </div>
-
-            {/* Name + Verified Badge */}
-            <div className="flex items-center gap-2 mb-1">
-              <h1 className="text-xl font-bold text-white">{company.name}</h1>
-              {company.is_verified === 1 && (
-                <span title="Compte vérifié"><CheckCircle2 size={16} style={{ color: "#00c4d4" }} /></span>
-              )}
-            </div>
-
-            {company.sector && (
-              <p className="text-sm mb-3" style={{ color: "rgba(255,255,255,0.5)" }}>{company.sector}</p>
-            )}
-
-            {/* Meta pills */}
-            <div className="flex flex-wrap gap-2 mb-4">
-              {company.city && (
-                <span className="flex items-center gap-1 text-xs px-2.5 py-1 rounded-full" style={{ background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.45)", border: "1px solid rgba(255,255,255,0.08)" }}>
-                  <MapPin size={10} /> {company.city}{company.country ? `, ${company.country}` : ""}
-                </span>
-              )}
-              {company.company_size && (
-                <span className="flex items-center gap-1 text-xs px-2.5 py-1 rounded-full" style={{ background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.45)", border: "1px solid rgba(255,255,255,0.08)" }}>
-                  <Users size={10} /> {company.company_size} employés
-                </span>
-              )}
+            <div className="hidden gap-2 sm:flex">
               {company.website && (
                 <a
                   href={company.website.startsWith("http") ? company.website : `https://${company.website}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-1 text-xs px-2.5 py-1 rounded-full transition-colors"
-                  style={{ background: "rgba(0,196,212,0.08)", color: "#00c4d4", border: "1px solid rgba(0,196,212,0.2)" }}
+                  className="inline-flex h-9 items-center gap-1.5 rounded-full border border-border/60 px-3 text-xs font-bold text-text-dark hover:border-primary/40 hover:text-primary"
                 >
-                  <Globe size={10} /> Site web <ExternalLink size={8} />
+                  <Globe size={14} />
+                  Site web
                 </a>
               )}
             </div>
-
-            {/* Stats row */}
-            <div className="grid grid-cols-3 gap-2">
-              {[
-                { value: company.published_offers_count ?? 0, label: "Offres actives", color: "#00c4d4" },
-                { value: followersCount, label: "Abonnés", color: "#a78bfa" },
-                { value: "", label: "ITGA Verified", color: "#10b981", icon: true },
-              ].map((s, i) => (
-                <div key={i} className="text-center py-3 rounded-xl" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
-                  {s.icon ? (
-                    <CheckCircle2 size={20} style={{ color: s.color, margin: "0 auto 4px" }} />
-                  ) : (
-                    <p className="text-lg font-bold" style={{ color: s.color }}>{s.value}</p>
-                  )}
-                  <p className="text-[10px]" style={{ color: "rgba(255,255,255,0.3)" }}>{s.label}</p>
-                </div>
-              ))}
-            </div>
           </div>
-        </div>
 
-        {/* ─── Description ─── */}
-        {company.description && (
-          <div className="rounded-2xl p-5 space-y-2" style={{ background: "#0d1525", border: "1px solid rgba(255,255,255,0.08)" }}>
-            <h2 className="text-sm font-semibold" style={{ color: "rgba(255,255,255,0.7)" }}>À propos</h2>
-            <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.55)", whiteSpace: "pre-line" }}>{company.description}</p>
-          </div>
-        )}
-
-        {/* ─── RSE / Commitments ─── */}
-        {company.rse_commitments && (
-          <div className="rounded-2xl p-5" style={{ background: "rgba(16,185,129,0.05)", border: "1px solid rgba(16,185,129,0.15)" }}>
-            <div className="flex items-center gap-2 mb-2">
-              <Leaf size={14} style={{ color: "#10b981" }} />
-              <h2 className="text-sm font-semibold" style={{ color: "#10b981" }}>Engagements RSE</h2>
-            </div>
-            <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.55)", whiteSpace: "pre-line" }}>{company.rse_commitments}</p>
-          </div>
-        )}
-
-        {/* ─── Job Offers ─── */}
-        <div>
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2">
-              <div className="w-0.5 h-4 rounded-full" style={{ background: "#00c4d4" }} />
-              <h2 className="text-base font-bold text-white">Offres d&apos;emploi</h2>
-              {(company.published_offers_count ?? 0) > 0 && (
-                <span className="text-xs px-2 py-0.5 rounded-full font-semibold" style={{ background: "rgba(0,196,212,0.1)", color: "#00c4d4", border: "1px solid rgba(0,196,212,0.2)" }}>
-                  {company.published_offers_count}
+          <div className="mt-3">
+            <div className="flex flex-wrap items-center gap-2">
+              <h1 className="text-2xl font-black text-text-main">{company.name}</h1>
+              {isCertified ? (
+                <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-[11px] font-black text-primary">
+                  <ShieldCheck size={13} />
+                  Certifiee ITGA
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1 rounded-full bg-bg-light px-2.5 py-1 text-[11px] font-bold text-text-light">
+                  <Clock size={13} />
+                  Certification non validee
                 </span>
               )}
             </div>
+            <p className="mt-1 text-sm text-text-light">{company.sector ?? "Entreprise tech"}</p>
           </div>
 
-          {jobs.length === 0 ? (
-            <div className="rounded-2xl p-8 text-center" style={{ background: "#0d1525", border: "1px solid rgba(255,255,255,0.06)" }}>
-              <Briefcase size={32} style={{ color: "rgba(255,255,255,0.1)", margin: "0 auto 10px" }} />
-              <p className="text-sm" style={{ color: "rgba(255,255,255,0.3)" }}>Aucune offre publiée pour le moment.</p>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {jobs.map((job) => (
-                <JobCard key={job.id} job={job} onOpen={() => router.push(`/jobs/${job.id}`)} />
-              ))}
-              {hasMore && (
-                <button
-                  onClick={() => load(jobs.length)}
-                  className="w-full py-3 rounded-2xl text-sm font-medium transition-colors cursor-pointer"
-                  style={{ background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.4)", border: "1px solid rgba(255,255,255,0.08)" }}
-                >
-                  Voir plus d&apos;offres
-                </button>
-              )}
-            </div>
-          )}
+          <div className="mt-4 flex flex-wrap gap-2">
+            {location && <MetaPill icon={MapPin} label={location} />}
+            {company.company_size && <MetaPill icon={Users} label={`${company.company_size} employes`} />}
+            {company.website && <MetaPill icon={Globe} label="Site officiel" />}
+          </div>
+
+          <div className="mt-5 grid grid-cols-3 gap-2">
+            <StatTile value={company.published_offers_count ?? 0} label="Offres actives" accent="text-primary" />
+            <StatTile value={followersCount} label="Abonnes" accent="text-magenta" />
+            <StatTile value={isCertified ? "OK" : "-"} label="Badge ITGA" accent={isCertified ? "text-green" : "text-text-light"} />
+          </div>
+        </div>
+      </section>
+
+      {company.description && (
+        <section className="card p-5">
+          <h2 className="text-sm font-black text-text-main">A propos</h2>
+          <p className="mt-2 whitespace-pre-line text-sm leading-relaxed text-text-dark">{company.description}</p>
+        </section>
+      )}
+
+      {company.rse_commitments && (
+        <section className="card border-green/15 bg-green/5 p-5">
+          <div className="mb-2 flex items-center gap-2">
+            <Leaf size={16} className="text-green" />
+            <h2 className="text-sm font-black text-green">Engagements</h2>
+          </div>
+          <p className="whitespace-pre-line text-sm leading-relaxed text-text-dark">{company.rse_commitments}</p>
+        </section>
+      )}
+
+      <section className="space-y-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="h-5 w-1 rounded-full bg-primary" />
+            <h2 className="text-base font-black text-text-main">Offres d'emploi</h2>
+            <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-black text-primary">
+              {company.published_offers_count ?? jobs.length}
+            </span>
+          </div>
+          <Link href="/jobs" className="text-xs font-bold text-primary hover:underline">Tout voir</Link>
         </div>
 
-        {/* ─── Company Activity ─── */}
-        <div>
-          <div className="flex items-center gap-2 mb-3">
-            <div className="w-0.5 h-4 rounded-full" style={{ background: "#a78bfa" }} />
-            <h2 className="text-base font-bold text-white">Activité de l&apos;entreprise</h2>
+        {jobs.length === 0 ? (
+          <EmptyPanel icon={Briefcase} label="Aucune offre publiee pour le moment." />
+        ) : (
+          <div className="space-y-3">
+            {jobs.map((job) => (
+              <JobCard key={job.id} job={job} onOpen={() => router.push(`/jobs/${job.id}`)} />
+            ))}
+            {hasMore && (
+              <button
+                onClick={() => load(jobs.length)}
+                className="card w-full py-3 text-sm font-bold text-primary transition-colors hover:bg-bg-light/40"
+              >
+                Voir plus d'offres
+              </button>
+            )}
           </div>
-          {recentPosts.length === 0 ? (
-            <div className="rounded-2xl p-6 text-center" style={{ background: "#0d1525", border: "1px solid rgba(255,255,255,0.06)" }}>
-              <p className="text-sm" style={{ color: "rgba(255,255,255,0.3)" }}>
-                Aucune publication entreprise pour le moment.
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {recentPosts.map((post) => (
-                <button
-                  key={post.id}
-                  onClick={() => router.push(`/post/${post.id}`)}
-                  className="w-full text-left rounded-2xl p-4 transition-all cursor-pointer"
-                  style={{ background: "#0d1525", border: "1px solid rgba(255,255,255,0.08)" }}
-                >
-                  <p className="text-sm font-semibold text-white mb-1 line-clamp-2">{post.desc || "Publication entreprise"}</p>
-                  <p className="text-[11px]" style={{ color: "rgba(255,255,255,0.35)" }}>
-                    {formatTimeAgo(post.created_at)}
-                  </p>
-                </button>
-              ))}
-            </div>
-          )}
+        )}
+      </section>
+
+      <section className="space-y-3">
+        <div className="flex items-center gap-2">
+          <div className="h-5 w-1 rounded-full bg-magenta" />
+          <h2 className="text-base font-black text-text-main">Activite de l'entreprise</h2>
         </div>
-      </div>
+        {recentPosts.length === 0 ? (
+          <EmptyPanel icon={Building2} label="Aucune publication entreprise pour le moment." />
+        ) : (
+          <div className="space-y-3">
+            {recentPosts.map((post) => (
+              <button
+                key={post.id}
+                onClick={() => router.push(`/post/${post.id}`)}
+                className="card-interactive w-full p-4 text-left"
+              >
+                <p className="line-clamp-2 text-sm font-bold text-text-main">{post.desc || "Publication entreprise"}</p>
+                <p className="mt-1 text-[11px] text-text-light">{formatTimeAgo(post.created_at)}</p>
+              </button>
+            ))}
+          </div>
+        )}
+      </section>
+    </div>
+  );
+}
+
+function MetaPill({ icon: Icon, label }: { icon: typeof MapPin; label: string }) {
+  return (
+    <span className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-bg-light/60 px-2.5 py-1 text-xs font-bold text-text-dark">
+      <Icon size={12} />
+      {label}
+    </span>
+  );
+}
+
+function StatTile({ value, label, accent }: { value: string | number; label: string; accent: string }) {
+  return (
+    <div className="rounded-lg border border-border/60 bg-bg-light/40 px-2 py-3 text-center">
+      <p className={cn("text-lg font-black", accent)}>{value}</p>
+      <p className="mt-0.5 text-[10px] font-semibold text-text-light">{label}</p>
+    </div>
+  );
+}
+
+function EmptyPanel({ icon: Icon, label }: { icon: typeof Briefcase; label: string }) {
+  return (
+    <div className="card flex flex-col items-center justify-center gap-2 px-4 py-10 text-center">
+      <Icon size={32} className="text-text-light/35" />
+      <p className="text-sm text-text-light">{label}</p>
     </div>
   );
 }
 
 function JobCard({ job, onOpen }: { job: JobOffer; onOpen: () => void }) {
-  const ct = job.contract_type;
-  const cfg = CONTRACT_COLORS[ct] ?? CONTRACT_COLORS.freelance;
+  const contractClass = CONTRACT_COLORS[job.contract_type] ?? CONTRACT_COLORS.freelance;
+
   return (
-    <button
-      onClick={onOpen}
-      className="w-full text-left rounded-2xl p-4 transition-all cursor-pointer group"
-      style={{ background: "#0d1525", border: "1px solid rgba(255,255,255,0.08)" }}
-      onMouseEnter={(e) => { e.currentTarget.style.borderColor = "rgba(0,196,212,0.25)"; e.currentTarget.style.background = "#101d30"; }}
-      onMouseLeave={(e) => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)"; e.currentTarget.style.background = "#0d1525"; }}
-    >
+    <button onClick={onOpen} className="card-interactive w-full p-4 text-left">
       <div className="flex items-start justify-between gap-3">
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-white mb-1 truncate">{job.title}</p>
-          <div className="flex flex-wrap items-center gap-2 mb-2">
-            <span className="text-xs px-2 py-0.5 rounded-full font-medium" style={{ background: cfg.bg, color: cfg.text, border: `1px solid ${cfg.border}` }}>
-              {CONTRACT_LABELS[ct]}
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-sm font-black text-text-main">{job.title}</p>
+          <div className="mt-2 flex flex-wrap items-center gap-1.5">
+            <span className={cn("rounded-md border px-2 py-0.5 text-[10px] font-black", contractClass)}>
+              {CONTRACT_LABELS[job.contract_type] ?? job.contract_type}
             </span>
             {job.location_type && (
-              <span className="text-[11px]" style={{ color: "rgba(255,255,255,0.4)" }}>
-                {LOCATION_LABELS[job.location_type]}
+              <span className="inline-flex items-center gap-0.5 rounded-md bg-bg-light px-2 py-0.5 text-[10px] font-bold text-text-dark">
+                <MapPin size={9} />
+                {LOCATION_LABELS[job.location_type] ?? job.location_type}
               </span>
             )}
-            {job.location_city && (
-              <span className="flex items-center gap-0.5 text-[11px]" style={{ color: "rgba(255,255,255,0.35)" }}>
-                <MapPin size={9} />{job.location_city}
-              </span>
-            )}
+            {job.location_city && <span className="text-[10px] text-text-light">{job.location_city}</span>}
           </div>
-          <div className="flex items-center gap-3">
+          <div className="mt-2 flex items-center gap-3 text-[11px] text-text-light">
             {job.deadline && (
-                <span className="flex items-center gap-1 text-[11px]" style={{ color: "rgba(255,255,255,0.3)" }}>
-                  <Clock size={9} />Jusqu&apos;au {new Date(job.deadline).toLocaleDateString("fr-FR")}
+              <span className="inline-flex items-center gap-1">
+                <Clock size={10} />
+                Jusqu'au {new Date(job.deadline).toLocaleDateString("fr-FR")}
               </span>
             )}
-            <span className="text-[11px]" style={{ color: "rgba(255,255,255,0.2)" }}>{formatTimeAgo(job.created_at)}</span>
+            <span>{formatTimeAgo(job.created_at)}</span>
           </div>
         </div>
-        <ChevronRight size={14} style={{ color: "rgba(255,255,255,0.2)", flexShrink: 0, marginTop: 2 }} />
+        <ChevronRight size={16} className="mt-1 shrink-0 text-text-light/50" />
       </div>
     </button>
   );

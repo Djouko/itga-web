@@ -31,6 +31,7 @@ import { PostService } from "@/lib/services/post-service";
 import { UserService } from "@/lib/services/user-service";
 import { getActingCompanyId } from "@/lib/company-acting";
 import { getReportReasonsWithFallback } from "@/lib/report-reasons";
+import { MentionProfileLink } from "@/components/text/mention-profile-link";
 
 interface PostCardProps {
   post: Post;
@@ -481,9 +482,9 @@ function PostDescription({ text }: { text: string }) {
           }
           if (part.startsWith("@")) {
             return (
-              <Link key={i} href={`/search?q=${encodeURIComponent(part.slice(1))}`} className="text-magenta font-medium hover:underline">
+              <MentionProfileLink key={i} username={part.slice(1)} className="text-magenta">
                 {part}
-              </Link>
+              </MentionProfileLink>
             );
           }
           return <span key={i}>{part}</span>;

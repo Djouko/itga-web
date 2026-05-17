@@ -44,19 +44,19 @@ const LOCATION_LABELS: Record<LocationType, string> = {
 };
 
 const CONTRACT_COLORS: Record<ContractType, string> = {
-  stage: "bg-blue-100 text-blue-700",
-  alternance: "bg-purple-100 text-purple-700",
-  cdi: "bg-green-100 text-green-700",
-  cdd: "bg-orange-100 text-orange-700",
-  freelance: "bg-cyan-100 text-cyan-700",
+  stage: "bg-blue-500/10 text-blue-500 border-blue-500/20",
+  alternance: "bg-purple-500/10 text-purple-500 border-purple-500/20",
+  cdi: "bg-green/10 text-green border-green/20",
+  cdd: "bg-orange/10 text-orange border-orange/20",
+  freelance: "bg-cyan/10 text-cyan border-cyan/20",
 };
 
 const STATUS_COLORS: Record<string, string> = {
-  received: "bg-blue-100 text-blue-700",
-  in_review: "bg-yellow-100 text-yellow-700",
-  interview: "bg-purple-100 text-purple-700",
-  accepted: "bg-green-100 text-green-700",
-  rejected: "bg-red-100 text-red-700",
+  received: "bg-blue-500/10 text-blue-500 border border-blue-500/20",
+  in_review: "bg-gold/10 text-gold border border-gold/20",
+  interview: "bg-purple-500/10 text-purple-500 border border-purple-500/20",
+  accepted: "bg-green/10 text-green border border-green/20",
+  rejected: "bg-red/10 text-red border border-red/20",
 };
 
 const STATUS_LABELS: Record<string, string> = {
@@ -180,7 +180,7 @@ export default function JobDetailPage() {
 
       <div className="p-4 space-y-4 pb-32">
         {/* Company card */}
-        <div className="bg-white rounded-2xl border border-border/20 p-4">
+        <div className="card p-4">
           <div className="flex gap-3 items-center">
             <div className="w-14 h-14 rounded-xl bg-bg-light flex items-center justify-center overflow-hidden shrink-0">
               {logo ? (
@@ -193,11 +193,11 @@ export default function JobDetailPage() {
               <h2 className="text-base font-bold text-text-main">{job.title}</h2>
               <p className="text-sm text-text-light">{job.company?.name ?? "—"}</p>
               <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
-                <span className={cn("px-2 py-0.5 rounded-md text-[10px] font-semibold", CONTRACT_COLORS[job.contract_type] ?? "bg-gray-100 text-gray-600")}>
+                <span className={cn("px-2 py-0.5 rounded-md border text-[10px] font-semibold", CONTRACT_COLORS[job.contract_type] ?? "bg-bg-light text-text-dark border-border/40")}>
                   {CONTRACT_LABELS[job.contract_type] ?? job.contract_type}
                 </span>
                 {job.location_type && (
-                  <span className="flex items-center gap-0.5 px-2 py-0.5 rounded-md bg-gray-100 text-gray-600 text-[10px] font-medium">
+                  <span className="flex items-center gap-0.5 px-2 py-0.5 rounded-md bg-bg-light text-text-dark text-[10px] font-medium">
                     <MapPin size={9} />
                     {LOCATION_LABELS[job.location_type] ?? job.location_type}
                   </span>
@@ -237,21 +237,21 @@ export default function JobDetailPage() {
 
         {/* Application status */}
         {job.is_applied === 1 && job.application_status && (
-          <div className={cn("rounded-xl p-3 flex items-center gap-2", STATUS_COLORS[job.application_status] ?? "bg-gray-100")}>
+          <div className={cn("rounded-xl p-3 flex items-center gap-2", STATUS_COLORS[job.application_status] ?? "bg-bg-light text-text-dark border border-border/40")}>
             <CheckCircle2 size={16} />
             <p className="text-xs font-semibold">{t("jobs.applicationStatus")}: {STATUS_LABELS[job.application_status] ?? job.application_status}</p>
           </div>
         )}
 
         {/* Description */}
-        <section className="bg-white rounded-2xl border border-border/20 p-4">
+        <section className="card p-4">
           <h3 className="text-sm font-bold text-text-main mb-2">{t("jobs.description")}</h3>
           <p className="text-sm text-text-light leading-relaxed whitespace-pre-line">{job.description}</p>
         </section>
 
         {/* Missions */}
         {job.missions && (
-          <section className="bg-white rounded-2xl border border-border/20 p-4">
+          <section className="card p-4">
             <h3 className="text-sm font-bold text-text-main mb-2">{t("jobs.missions")}</h3>
             <p className="text-sm text-text-light leading-relaxed whitespace-pre-line">{job.missions}</p>
           </section>
@@ -259,7 +259,7 @@ export default function JobDetailPage() {
 
         {/* Skills */}
         {skills.length > 0 && (
-          <section className="bg-white rounded-2xl border border-border/20 p-4">
+          <section className="card p-4">
             <h3 className="text-sm font-bold text-text-main mb-2">{t("jobs.requiredSkills")}</h3>
             <div className="flex flex-wrap gap-2">
               {skills.map((skill, i) => (
@@ -273,7 +273,7 @@ export default function JobDetailPage() {
 
         {/* Company info */}
         {job.company && (
-          <section className="bg-white rounded-2xl border border-border/20 p-4">
+          <section className="card p-4">
             <h3 className="text-sm font-bold text-text-main mb-3">{t("jobs.aboutCompany")}</h3>
             <button
               onClick={() => router.push(`/company/${job.company!.id}`)}
@@ -292,11 +292,11 @@ export default function JobDetailPage() {
               <p className="text-xs text-text-light leading-relaxed mb-2">{job.company.description}</p>
             )}
             {job.company.rse_commitments && (
-              <div className="flex items-start gap-2 p-2.5 rounded-xl bg-green-50 border border-green-100 mt-2">
-                <Leaf size={14} className="text-green-600 shrink-0 mt-0.5" />
+              <div className="flex items-start gap-2 p-2.5 rounded-xl bg-green/10 border border-green/20 mt-2">
+                <Leaf size={14} className="text-green shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-[10px] font-semibold text-green-700 mb-0.5">{t("jobs.rseCommitments")}</p>
-                  <p className="text-xs text-green-700 leading-relaxed">{job.company.rse_commitments}</p>
+                  <p className="text-[10px] font-semibold text-green mb-0.5">{t("jobs.rseCommitments")}</p>
+                  <p className="text-xs text-text-dark leading-relaxed">{job.company.rse_commitments}</p>
                 </div>
               </div>
             )}
@@ -321,10 +321,10 @@ export default function JobDetailPage() {
         <div className="fixed bottom-0 left-0 right-0 bg-card/90 backdrop-blur-xl border-t border-border/30 p-4 z-30">
           <div className="max-w-2xl mx-auto">
             {actingAsCompany ? (
-              <div className="rounded-xl border border-cyan-200 bg-cyan-50 p-3">
+              <div className="rounded-xl border border-cyan/20 bg-cyan/10 p-3">
                 <div className="flex items-start gap-2">
-                  <Building2 size={16} className="text-cyan-700 shrink-0 mt-0.5" />
-                  <div className="flex-1 text-xs text-cyan-900 leading-relaxed">
+                  <Building2 size={16} className="text-cyan shrink-0 mt-0.5" />
+                  <div className="flex-1 text-xs text-text-dark leading-relaxed">
                     <p className="font-semibold mb-1">Mode entreprise actif</p>
                     <p>La candidature serait enregistrée à votre nom personnel et non au nom de l’entreprise. Désactivez le mode entreprise pour postuler.</p>
                   </div>
@@ -335,7 +335,7 @@ export default function JobDetailPage() {
                     disableCompanyActingMode();
                     setActingAsCompany(false);
                   }}
-                  className="mt-2 w-full py-2 rounded-lg bg-cyan-600 hover:bg-cyan-700 text-white text-xs font-semibold transition-colors cursor-pointer"
+                    className="mt-2 w-full py-2 rounded-lg bg-cyan hover:bg-cyan/90 text-white text-xs font-semibold transition-colors cursor-pointer"
                 >
                   Désactiver le mode entreprise
                 </button>

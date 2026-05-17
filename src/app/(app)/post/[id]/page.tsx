@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { Avatar, VerifyBadge } from "@/components/ui/avatar";
 import { PostCard } from "@/components/post/post-card";
+import { MentionProfileLink } from "@/components/text/mention-profile-link";
 import { useAuthStore, useTranslation } from "@/lib/store";
 import { PostService } from "@/lib/services/post-service";
 import { cn, formatTimeAgo } from "@/lib/utils";
@@ -610,9 +611,9 @@ function CommentText({ text }: { text: string }) {
         }
         if (part.startsWith("@")) {
           return (
-            <Link key={i} href={`/search?q=${encodeURIComponent(part.slice(1))}`} className="text-magenta font-medium hover:underline">
+            <MentionProfileLink key={i} username={part.slice(1)} className="text-magenta">
               {part}
-            </Link>
+            </MentionProfileLink>
           );
         }
         return <span key={i}>{part}</span>;

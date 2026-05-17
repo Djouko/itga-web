@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Shuffle, PenSquare, Check, AlertCircle, RefreshCw, ImageIcon, VideoIcon, Loader2, Users, Lock, Globe, Building2, ShieldCheck } from "lucide-react";
+import { Shuffle, PenSquare, Check, AlertCircle, RefreshCw, ImageIcon, VideoIcon, Loader2, Users, Lock, Globe, Building2, ShieldCheck, Mic2 } from "lucide-react";
 import { UnderlineTabs } from "@/components/ui/tabs";
 import { PostCard } from "@/components/post/post-card";
 import { Avatar } from "@/components/ui/avatar";
@@ -397,7 +397,7 @@ export default function FeedPage() {
             <span>{t("feed.video")}</span>
           </Link>
           <Link href="/create" className="flex-1 flex items-center justify-center gap-1.5 py-2 text-[11px] font-semibold text-text-dark hover:bg-bg-light/60 transition-all duration-200 rounded-br-lg group">
-            <PenSquare size={13} className="text-magenta group-hover:scale-110 transition-transform duration-200" />
+            <Mic2 size={14} className="text-magenta group-hover:scale-110 transition-transform duration-200" />
             <span>{t("feed.article")}</span>
           </Link>
         </div>

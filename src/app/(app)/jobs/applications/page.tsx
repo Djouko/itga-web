@@ -25,11 +25,11 @@ import type { JobApplication, ApplicationStatus } from "@/lib/types";
 const PAGE_SIZE = 15;
 
 const STATUS_CONFIG: Record<ApplicationStatus, { label: string; icon: typeof Clock; color: string }> = {
-  received: { label: "Reçue", icon: Clock, color: "bg-blue-100 text-blue-700" },
-  in_review: { label: "En examen", icon: Eye, color: "bg-yellow-100 text-yellow-700" },
-  interview: { label: "Entretien", icon: MessageSquare, color: "bg-purple-100 text-purple-700" },
-  accepted: { label: "Acceptée", icon: CheckCircle2, color: "bg-green-100 text-green-700" },
-  rejected: { label: "Refusée", icon: XCircle, color: "bg-red-100 text-red-700" },
+  received: { label: "Reçue", icon: Clock, color: "bg-blue-500/10 text-blue-500 border border-blue-500/20" },
+  in_review: { label: "En examen", icon: Eye, color: "bg-gold/10 text-gold border border-gold/20" },
+  interview: { label: "Entretien", icon: MessageSquare, color: "bg-purple-500/10 text-purple-500 border border-purple-500/20" },
+  accepted: { label: "Acceptée", icon: CheckCircle2, color: "bg-green/10 text-green border border-green/20" },
+  rejected: { label: "Refusée", icon: XCircle, color: "bg-red/10 text-red border border-red/20" },
 };
 
 export default function MyApplicationsPage() {
@@ -101,10 +101,10 @@ export default function MyApplicationsPage() {
 
       <div className="pb-8">
         {actingAsCompany && (
-          <div className="mx-4 mt-4 rounded-xl border border-cyan-200 bg-cyan-50 p-3">
+          <div className="mx-4 mt-4 rounded-xl border border-cyan/20 bg-cyan/10 p-3">
             <div className="flex items-start gap-2">
-              <Building2 size={16} className="text-cyan-700 shrink-0 mt-0.5" />
-              <p className="text-xs text-cyan-900 leading-relaxed">
+              <Building2 size={16} className="text-cyan shrink-0 mt-0.5" />
+              <p className="text-xs text-text-dark leading-relaxed">
                 <span className="font-semibold">Mode entreprise actif.</span>{" "}
                 Vous consultez vos candidatures personnelles. Les candidatures envoyées à votre nom n’incluent pas l’identité entreprise.
               </p>
@@ -134,7 +134,7 @@ export default function MyApplicationsPage() {
                 <div
                   key={app.id}
                   onClick={() => router.push(`/jobs/${app.job_offer_id}`)}
-                  className="bg-white rounded-2xl border border-border/20 p-4 hover:shadow-md transition-all cursor-pointer"
+                  className="card-interactive p-4"
                 >
                   <div className="flex gap-3">
                     <div className="w-11 h-11 rounded-xl bg-bg-light flex items-center justify-center overflow-hidden shrink-0">

@@ -23,15 +23,20 @@ export function Avatar({ src, alt, size = 40, className, isVerified, onClick }: 
     .toUpperCase();
 
   return (
-    <div className={cn("relative inline-flex shrink-0", className)} onClick={onClick} role={onClick ? "button" : undefined}>
+    <div
+      className={cn("relative inline-flex shrink-0 overflow-visible rounded-full", className)}
+      style={{ width: size, height: size }}
+      onClick={onClick}
+      role={onClick ? "button" : undefined}
+    >
       {src && !hasError ? (
         <Image
           src={src}
           alt={alt}
           width={size}
           height={size}
-          className="rounded-full object-cover"
-          style={{ width: size, height: size }}
+          className="block rounded-full object-cover"
+          style={{ width: size, height: size, minWidth: size, minHeight: size }}
           onError={() => setHasError(true)}
           unoptimized
         />

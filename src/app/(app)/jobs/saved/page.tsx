@@ -25,9 +25,11 @@ const LOCATION_LABELS: Record<LocationType, string> = {
   remote: "Remote", hybrid: "Hybride", onsite: "Sur site",
 };
 const CONTRACT_COLORS: Record<ContractType, string> = {
-  stage: "bg-blue-100 text-blue-700", alternance: "bg-purple-100 text-purple-700",
-  cdi: "bg-green-100 text-green-700", cdd: "bg-orange-100 text-orange-700",
-  freelance: "bg-cyan-100 text-cyan-700",
+  stage: "bg-blue-500/10 text-blue-500 border-blue-500/20",
+  alternance: "bg-purple-500/10 text-purple-500 border-purple-500/20",
+  cdi: "bg-green/10 text-green border-green/20",
+  cdd: "bg-orange/10 text-orange border-orange/20",
+  freelance: "bg-cyan/10 text-cyan border-cyan/20",
 };
 
 export default function SavedJobsPage() {
@@ -119,7 +121,7 @@ export default function SavedJobsPage() {
                 <div
                   key={job.id}
                   onClick={() => router.push(`/jobs/${job.id}`)}
-                  className="bg-white rounded-2xl border border-border/20 p-4 hover:shadow-md transition-all cursor-pointer"
+                  className="card-interactive p-4"
                 >
                   <div className="flex gap-3">
                     <div className="w-12 h-12 rounded-xl bg-bg-light flex items-center justify-center overflow-hidden shrink-0">
@@ -137,11 +139,11 @@ export default function SavedJobsPage() {
                       </div>
                       <p className="text-xs text-text-light mt-0.5">{job.company?.name ?? "—"}</p>
                       <div className="flex flex-wrap items-center gap-1.5 mt-2">
-                        <span className={cn("px-2 py-0.5 rounded-md text-[10px] font-semibold", CONTRACT_COLORS[job.contract_type] ?? "bg-gray-100 text-gray-600")}>
+                        <span className={cn("px-2 py-0.5 rounded-md border text-[10px] font-semibold", CONTRACT_COLORS[job.contract_type] ?? "bg-bg-light text-text-dark border-border/40")}>
                           {CONTRACT_LABELS[job.contract_type] ?? job.contract_type}
                         </span>
                         {job.location_type && (
-                          <span className="flex items-center gap-0.5 px-2 py-0.5 rounded-md bg-gray-100 text-gray-600 text-[10px] font-medium">
+                          <span className="flex items-center gap-0.5 px-2 py-0.5 rounded-md bg-bg-light text-text-dark text-[10px] font-medium">
                             <MapPin size={9} />{LOCATION_LABELS[job.location_type]}
                           </span>
                         )}
