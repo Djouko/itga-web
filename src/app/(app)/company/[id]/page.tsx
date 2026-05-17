@@ -7,10 +7,11 @@ import {
   ArrowLeft,
   Briefcase,
   Building2,
+  Calendar,
   ChevronRight,
   Clock,
   Globe,
-  Leaf,
+  Info,
   MapPin,
   Settings,
   ShieldCheck,
@@ -18,6 +19,7 @@ import {
   UserPlus,
   Users,
 } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { Avatar, VerifyBadge } from "@/components/ui/avatar";
 import { useAuthStore } from "@/lib/store";
 import { CompanyService } from "@/lib/services/company-service";
@@ -42,7 +44,7 @@ const LOCATION_LABELS: Record<LocationType, string> = {
 const CONTRACT_COLORS: Record<ContractType, string> = {
   stage: "bg-blue-500/10 text-blue-500 border-blue-500/20",
   alternance: "bg-purple-500/10 text-purple-500 border-purple-500/20",
-  cdi: "bg-green-500/10 text-green-500 border-green-500/20",
+  cdi: "bg-green/10 text-green border-green/20",
   cdd: "bg-orange/10 text-orange border-orange/20",
   freelance: "bg-cyan/10 text-cyan border-cyan/20",
 };
@@ -121,10 +123,12 @@ export default function CompanyPublicProfilePage() {
 
   if (loading) {
     return (
-      <div className="card flex min-h-[360px] items-center justify-center">
-        <div className="flex flex-col items-center gap-3">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-          <span className="text-sm text-text-light">Chargement du profil...</span>
+      <div className="animate-fadeIn">
+        <div className="h-[200px] skeleton" />
+        <div className="px-4 pt-12">
+          <div className="h-5 w-44 rounded skeleton" />
+          <div className="mt-2 h-3 w-28 rounded skeleton" />
+          <div className="mt-5 h-16 rounded-xl skeleton" />
         </div>
       </div>
     );
@@ -132,9 +136,9 @@ export default function CompanyPublicProfilePage() {
 
   if (!company) {
     return (
-      <div className="card flex min-h-[360px] flex-col items-center justify-center gap-4 text-center">
-        <Building2 size={44} className="text-text-light/30" />
-        <p className="font-semibold text-text-main">Entreprise introuvable.</p>
+      <div className="flex min-h-[360px] flex-col items-center justify-center gap-3 px-4 text-center">
+        <Building2 size={42} className="text-text-light/30" />
+        <p className="text-sm font-semibold text-text-main">Entreprise introuvable.</p>
         <button onClick={() => router.back()} className="rounded-full bg-primary px-4 py-2 text-sm font-bold text-white">
           Retour
         </button>
@@ -144,170 +148,149 @@ export default function CompanyPublicProfilePage() {
 
   const logo = addBaseURL(company.logo);
   const location = [company.city, company.country].filter(Boolean).join(", ");
+  const publishedOffers = company.published_offers_count ?? company.job_offers_count ?? jobs.length;
 
   return (
-    <div className="animate-fadeIn space-y-4 pb-10">
-      <header className="glass-header sticky top-0 z-20 -mx-3 border-b border-border/30 px-3 py-2 lg:-mx-4 lg:px-4">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => router.back()}
-            className="flex h-9 w-9 items-center justify-center rounded-full text-text-light transition-colors hover:bg-bg-light hover:text-text-main"
-            aria-label="Retour"
-          >
-            <ArrowLeft size={18} />
-          </button>
-          <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-1.5">
-              <p className="truncate text-sm font-black text-text-main">{company.name}</p>
-              {isCertified && <VerifyBadge size={14} />}
-            </div>
-            <p className="truncate text-[11px] text-text-light">{company.sector ?? "Entreprise ITGA"}</p>
-          </div>
-          {isOwner ? (
-            <Link
-              href="/company/dashboard"
-              className="inline-flex items-center gap-1.5 rounded-full border border-primary/25 bg-primary/10 px-3 py-1.5 text-xs font-bold text-primary"
+    <div className="min-h-screen bg-card animate-fadeIn">
+      <div className="relative">
+        <div className="relative h-[200px] sm:h-[240px] overflow-hidden bg-gradient-to-br from-primary via-navy to-magenta">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgba(255,255,255,.26)_1px,transparent_0)] [background-size:24px_24px]" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-black/10 to-transparent" />
+          <div className="absolute left-3 right-3 top-3 z-10 flex items-center justify-between">
+            <button
+              onClick={() => router.back()}
+              className="flex h-9 w-9 items-center justify-center rounded-full bg-black/30 text-white backdrop-blur-sm transition-colors hover:bg-black/50"
+              aria-label="Retour"
             >
-              <Settings size={13} />
-              Gerer
-            </Link>
-          ) : (
+              <ArrowLeft size={20} />
+            </button>
+            {isOwner && (
+              <Link
+                href="/company/dashboard"
+                className="inline-flex items-center gap-1.5 rounded-full bg-black/30 px-3 py-2 text-xs font-bold text-white backdrop-blur-sm transition-colors hover:bg-black/50"
+              >
+                <Settings size={14} />
+                Gerer
+              </Link>
+            )}
+          </div>
+        </div>
+
+        <div className="absolute -bottom-[42px] left-4 z-10">
+          <div className="rounded-2xl border-[3px] border-card bg-bg-light shadow-lg">
+            <Avatar src={logo} alt={company.name} size={88} isVerified={isCertified} />
+          </div>
+        </div>
+      </div>
+
+      <div className="px-4 pb-8 pt-[54px]">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-1.5">
+              <h1 className="truncate text-xl font-black text-text-main">{company.name}</h1>
+              {isCertified && <VerifyBadge size={18} />}
+              <span className="inline-flex items-center gap-1 rounded-full border border-primary/20 bg-primary/10 px-2 py-0.5 text-[11px] font-bold text-primary">
+                <Building2 size={11} />
+                Entreprise
+              </span>
+            </div>
+            <p className="mt-0.5 text-sm font-semibold text-magenta">@company-{company.id}</p>
+            <p className="mt-1 text-sm text-text-light">{company.sector ?? "Entreprise ITGA"}</p>
+          </div>
+
+          {!isOwner && (
             <button
               onClick={handleFollow}
               disabled={followLoading}
               className={cn(
-                "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold transition-all",
+                "mt-1 inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full px-4 text-sm font-bold transition-all",
                 following
                   ? "border border-primary/25 bg-primary/10 text-primary"
                   : "bg-gradient-to-r from-primary to-cyan text-white shadow-sm shadow-primary/20",
                 followLoading && "opacity-60"
               )}
             >
-              {following ? <UserCheck size={13} /> : <UserPlus size={13} />}
+              {following ? <UserCheck size={15} /> : <UserPlus size={15} />}
               {following ? "Abonne" : "Suivre"}
             </button>
           )}
         </div>
-      </header>
 
-      <section className="card overflow-hidden">
-        <div className="relative h-32 bg-gradient-to-br from-primary/25 via-cyan/15 to-magenta/10">
-          <div className="absolute inset-0 opacity-40 [background-image:radial-gradient(circle_at_1px_1px,rgba(255,255,255,.5)_1px,transparent_0)] [background-size:24px_24px]" />
-        </div>
-        <div className="px-5 pb-5">
-          <div className="-mt-12 flex items-end justify-between gap-4">
-            <div className="rounded-2xl bg-card p-1 shadow-sm ring-1 ring-border/40">
-              <Avatar src={logo} alt={company.name} size={84} className="rounded-2xl" isVerified={isCertified} />
-            </div>
-            <div className="hidden gap-2 sm:flex">
-              {company.website && (
-                <a
-                  href={company.website.startsWith("http") ? company.website : `https://${company.website}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex h-9 items-center gap-1.5 rounded-full border border-border/60 px-3 text-xs font-bold text-text-dark hover:border-primary/40 hover:text-primary"
-                >
-                  <Globe size={14} />
-                  Site web
-                </a>
-              )}
-            </div>
-          </div>
-
-          <div className="mt-3">
-            <div className="flex flex-wrap items-center gap-2">
-              <h1 className="text-2xl font-black text-text-main">{company.name}</h1>
-              {isCertified ? (
-                <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-[11px] font-black text-primary">
-                  <ShieldCheck size={13} />
-                  Certifiee ITGA
-                </span>
-              ) : (
-                <span className="inline-flex items-center gap-1 rounded-full bg-bg-light px-2.5 py-1 text-[11px] font-bold text-text-light">
-                  <Clock size={13} />
-                  Certification non validee
-                </span>
-              )}
-            </div>
-            <p className="mt-1 text-sm text-text-light">{company.sector ?? "Entreprise tech"}</p>
-          </div>
-
-          <div className="mt-4 flex flex-wrap gap-2">
-            {location && <MetaPill icon={MapPin} label={location} />}
-            {company.company_size && <MetaPill icon={Users} label={`${company.company_size} employes`} />}
-            {company.website && <MetaPill icon={Globe} label="Site officiel" />}
-          </div>
-
-          <div className="mt-5 grid grid-cols-3 gap-2">
-            <StatTile value={company.published_offers_count ?? 0} label="Offres actives" accent="text-primary" />
-            <StatTile value={followersCount} label="Abonnes" accent="text-magenta" />
-            <StatTile value={isCertified ? "OK" : "-"} label="Badge ITGA" accent={isCertified ? "text-green" : "text-text-light"} />
-          </div>
-        </div>
-      </section>
-
-      {company.description && (
-        <section className="card p-5">
-          <h2 className="text-sm font-black text-text-main">A propos</h2>
-          <p className="mt-2 whitespace-pre-line text-sm leading-relaxed text-text-dark">{company.description}</p>
-        </section>
-      )}
-
-      {company.rse_commitments && (
-        <section className="card border-green/15 bg-green/5 p-5">
-          <div className="mb-2 flex items-center gap-2">
-            <Leaf size={16} className="text-green" />
-            <h2 className="text-sm font-black text-green">Engagements</h2>
-          </div>
-          <p className="whitespace-pre-line text-sm leading-relaxed text-text-dark">{company.rse_commitments}</p>
-        </section>
-      )}
-
-      <section className="space-y-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="h-5 w-1 rounded-full bg-primary" />
-            <h2 className="text-base font-black text-text-main">Offres d'emploi</h2>
-            <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-black text-primary">
-              {company.published_offers_count ?? jobs.length}
-            </span>
-          </div>
-          <Link href="/jobs" className="text-xs font-bold text-primary hover:underline">Tout voir</Link>
+        <div className="mt-3 flex flex-wrap gap-2">
+          {location && <MetaPill icon={MapPin} label={location} />}
+          {company.company_size && <MetaPill icon={Users} label={`${company.company_size} employes`} />}
+          {company.website && (
+            <a
+              href={company.website.startsWith("http") ? company.website : `https://${company.website}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 rounded-full bg-primary/5 px-2.5 py-1 text-xs font-bold text-primary"
+            >
+              <Globe size={12} />
+              Site web
+            </a>
+          )}
         </div>
 
+        <div className="mt-4 flex items-center gap-0 border-y border-border/30 py-3">
+          <StatButton value={publishedOffers} label="Offres" />
+          <Divider />
+          <StatButton value={followersCount} label="Abonnes" />
+          <Divider />
+          <StatButton value={isCertified ? "OK" : "-"} label="Badge ITGA" />
+        </div>
+
+        {company.description && (
+          <section className="mt-3 rounded-xl border border-border/20 bg-bg-light/60 p-3">
+            <div className="mb-1 flex items-center gap-1.5 text-sm font-black text-text-main">
+              <Info size={14} />
+              A propos
+            </div>
+            <p className="whitespace-pre-line text-sm leading-relaxed text-text-dark">{company.description}</p>
+          </section>
+        )}
+
+        {isCertified ? (
+          <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-green/10 px-3 py-1.5 text-xs font-bold text-green">
+            <ShieldCheck size={14} />
+            Certification ITGA validee
+          </div>
+        ) : (
+          <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-bg-light px-3 py-1.5 text-xs font-bold text-text-light">
+            <Clock size={14} />
+            Certification ITGA en attente
+          </div>
+        )}
+
+        <SectionTitle title="Offres d'emploi" count={publishedOffers} actionLabel="Tout voir" actionHref="/jobs" />
         {jobs.length === 0 ? (
           <EmptyPanel icon={Briefcase} label="Aucune offre publiee pour le moment." />
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-2">
             {jobs.map((job) => (
               <JobCard key={job.id} job={job} onOpen={() => router.push(`/jobs/${job.id}`)} />
             ))}
             {hasMore && (
               <button
                 onClick={() => load(jobs.length)}
-                className="card w-full py-3 text-sm font-bold text-primary transition-colors hover:bg-bg-light/40"
+                className="w-full rounded-xl border border-border/40 py-3 text-sm font-bold text-primary transition-colors hover:bg-bg-light/50"
               >
                 Voir plus d'offres
               </button>
             )}
           </div>
         )}
-      </section>
 
-      <section className="space-y-3">
-        <div className="flex items-center gap-2">
-          <div className="h-5 w-1 rounded-full bg-magenta" />
-          <h2 className="text-base font-black text-text-main">Activite de l'entreprise</h2>
-        </div>
+        <SectionTitle title="Activite de l'entreprise" count={recentPosts.length} />
         {recentPosts.length === 0 ? (
           <EmptyPanel icon={Building2} label="Aucune publication entreprise pour le moment." />
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-2">
             {recentPosts.map((post) => (
               <button
                 key={post.id}
                 onClick={() => router.push(`/post/${post.id}`)}
-                className="card-interactive w-full p-4 text-left"
+                className="w-full rounded-xl border border-border/40 bg-bg-light/40 p-3 text-left transition-colors hover:bg-bg-light"
               >
                 <p className="line-clamp-2 text-sm font-bold text-text-main">{post.desc || "Publication entreprise"}</p>
                 <p className="mt-1 text-[11px] text-text-light">{formatTimeAgo(post.created_at)}</p>
@@ -315,34 +298,64 @@ export default function CompanyPublicProfilePage() {
             ))}
           </div>
         )}
-      </section>
+      </div>
     </div>
   );
 }
 
-function MetaPill({ icon: Icon, label }: { icon: typeof MapPin; label: string }) {
+function Divider() {
+  return <div className="h-8 w-px bg-border/30" />;
+}
+
+function StatButton({ value, label }: { value: string | number; label: string }) {
   return (
-    <span className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-bg-light/60 px-2.5 py-1 text-xs font-bold text-text-dark">
+    <div className="flex-1 rounded-lg py-1.5 text-center">
+      <span className="block text-lg font-black text-text-main">{value}</span>
+      <span className="block text-[11px] font-medium text-text-light">{label}</span>
+    </div>
+  );
+}
+
+function MetaPill({ icon: Icon, label }: { icon: LucideIcon; label: string }) {
+  return (
+    <span className="inline-flex items-center gap-1 rounded-full bg-bg-light px-2.5 py-1 text-xs font-bold text-text-dark">
       <Icon size={12} />
       {label}
     </span>
   );
 }
 
-function StatTile({ value, label, accent }: { value: string | number; label: string; accent: string }) {
+function SectionTitle({
+  title,
+  count,
+  actionLabel,
+  actionHref,
+}: {
+  title: string;
+  count: number;
+  actionLabel?: string;
+  actionHref?: string;
+}) {
   return (
-    <div className="rounded-lg border border-border/60 bg-bg-light/40 px-2 py-3 text-center">
-      <p className={cn("text-lg font-black", accent)}>{value}</p>
-      <p className="mt-0.5 text-[10px] font-semibold text-text-light">{label}</p>
+    <div className="mt-6 mb-3 flex items-center justify-between">
+      <div className="flex items-center gap-2">
+        <h2 className="text-base font-black text-text-main">{title}</h2>
+        <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-black text-primary">{count}</span>
+      </div>
+      {actionHref && actionLabel && (
+        <Link href={actionHref} className="text-xs font-bold text-primary hover:underline">
+          {actionLabel}
+        </Link>
+      )}
     </div>
   );
 }
 
-function EmptyPanel({ icon: Icon, label }: { icon: typeof Briefcase; label: string }) {
+function EmptyPanel({ icon: Icon, label }: { icon: LucideIcon; label: string }) {
   return (
-    <div className="card flex flex-col items-center justify-center gap-2 px-4 py-10 text-center">
-      <Icon size={32} className="text-text-light/35" />
-      <p className="text-sm text-text-light">{label}</p>
+    <div className="rounded-xl border border-border/30 bg-bg-light/40 px-4 py-8 text-center">
+      <Icon size={28} className="mx-auto text-text-light/35" />
+      <p className="mt-2 text-sm text-text-light">{label}</p>
     </div>
   );
 }
@@ -351,7 +364,7 @@ function JobCard({ job, onOpen }: { job: JobOffer; onOpen: () => void }) {
   const contractClass = CONTRACT_COLORS[job.contract_type] ?? CONTRACT_COLORS.freelance;
 
   return (
-    <button onClick={onOpen} className="card-interactive w-full p-4 text-left">
+    <button onClick={onOpen} className="w-full rounded-xl border border-border/40 bg-bg-light/40 p-3 text-left transition-colors hover:bg-bg-light">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
           <p className="truncate text-sm font-black text-text-main">{job.title}</p>
@@ -360,7 +373,7 @@ function JobCard({ job, onOpen }: { job: JobOffer; onOpen: () => void }) {
               {CONTRACT_LABELS[job.contract_type] ?? job.contract_type}
             </span>
             {job.location_type && (
-              <span className="inline-flex items-center gap-0.5 rounded-md bg-bg-light px-2 py-0.5 text-[10px] font-bold text-text-dark">
+              <span className="inline-flex items-center gap-0.5 rounded-md bg-card px-2 py-0.5 text-[10px] font-bold text-text-dark">
                 <MapPin size={9} />
                 {LOCATION_LABELS[job.location_type] ?? job.location_type}
               </span>
@@ -370,7 +383,7 @@ function JobCard({ job, onOpen }: { job: JobOffer; onOpen: () => void }) {
           <div className="mt-2 flex items-center gap-3 text-[11px] text-text-light">
             {job.deadline && (
               <span className="inline-flex items-center gap-1">
-                <Clock size={10} />
+                <Calendar size={10} />
                 Jusqu'au {new Date(job.deadline).toLocaleDateString("fr-FR")}
               </span>
             )}

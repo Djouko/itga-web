@@ -9,9 +9,9 @@ export default function AuthenticatedLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const isPublicCompanyProfile = /^\/company\/\d+$/.test(pathname);
 
-  // Company pages have their own full-screen, standalone layout — no ITGA sidebar
-  if (pathname.startsWith("/company")) {
+  if (pathname.startsWith("/company") && !isPublicCompanyProfile) {
     return <>{children}</>;
   }
 
