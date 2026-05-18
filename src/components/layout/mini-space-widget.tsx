@@ -70,7 +70,7 @@ export function MiniSpaceWidget() {
   if (!activeSpaceId || !isMinimized) return null;
 
   return (
-    <div className="fixed bottom-20 lg:bottom-6 left-1/2 -translate-x-1/2 z-50 animate-slideUp">
+    <div className="fixed bottom-24 lg:bottom-6 left-1/2 -translate-x-1/2 z-50 animate-slideUp">
       <div className="flex items-center gap-3 bg-navy border border-primary/20 rounded-2xl px-4 py-2.5 shadow-2xl shadow-navy-dark/60">
         {/* Pulse indicator */}
         <span className="w-2.5 h-2.5 rounded-full bg-cyan animate-pulse shrink-0" />

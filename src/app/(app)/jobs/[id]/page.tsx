@@ -318,7 +318,7 @@ export default function JobDetailPage() {
 
       {/* Sticky bottom bar */}
       {job.is_applied !== 1 && (
-        <div className="fixed bottom-0 left-0 right-0 bg-card/90 backdrop-blur-xl border-t border-border/30 p-4 z-30">
+        <div className="fixed bottom-[calc(84px+env(safe-area-inset-bottom,0px))] left-0 right-0 bg-card/90 backdrop-blur-xl border-t border-border/30 p-4 safe-area-bottom z-30 lg:bottom-0">
           <div className="max-w-2xl mx-auto">
             {actingAsCompany ? (
               <div className="rounded-xl border border-cyan/20 bg-cyan/10 p-3">

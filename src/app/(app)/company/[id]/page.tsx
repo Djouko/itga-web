@@ -275,13 +275,13 @@ export default function CompanyPublicProfilePage() {
                 onClick={() => load(jobs.length)}
                 className="w-full rounded-xl border border-border/40 py-3 text-sm font-bold text-primary transition-colors hover:bg-bg-light/50"
               >
-                Voir plus d'offres
+                Voir plus d&apos;offres
               </button>
             )}
           </div>
         )}
 
-        <SectionTitle title="Activite de l'entreprise" count={recentPosts.length} />
+        <SectionTitle title="Activite de l&apos;entreprise" count={recentPosts.length} />
         {recentPosts.length === 0 ? (
           <EmptyPanel icon={Building2} label="Aucune publication entreprise pour le moment." />
         ) : (
@@ -384,7 +384,7 @@ function JobCard({ job, onOpen }: { job: JobOffer; onOpen: () => void }) {
             {job.deadline && (
               <span className="inline-flex items-center gap-1">
                 <Calendar size={10} />
-                Jusqu'au {new Date(job.deadline).toLocaleDateString("fr-FR")}
+                Jusqu&apos;au {new Date(job.deadline).toLocaleDateString("fr-FR")}
               </span>
             )}
             <span>{formatTimeAgo(job.created_at)}</span>

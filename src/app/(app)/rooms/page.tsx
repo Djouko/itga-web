@@ -183,7 +183,10 @@ export default function RoomsPage() {
     if (typeof window === "undefined") return;
     const roomId = Number(new URLSearchParams(window.location.search).get("openRoom"));
     if (!roomId || !me) return;
-    openRoomDetail(roomId);
+    const timer = window.setTimeout(() => {
+      void openRoomDetail(roomId);
+    }, 0);
+    return () => window.clearTimeout(timer);
   }, [me, openRoomDetail]);
 
   /* ─── Leave room ─── */

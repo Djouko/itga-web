@@ -97,7 +97,7 @@ export function AppLayout({ children }: AppLayoutProps) {
       </div>
 
       {/* Main Content — LinkedIn-style centered with gap */}
-      <main className="lg:ml-[var(--sidebar-width)] min-h-screen pb-20 lg:pb-0">
+      <main className="lg:ml-[var(--sidebar-width)] min-h-screen pb-24 lg:pb-0">
         <div className="max-w-[1540px] mx-auto flex gap-5 px-3 lg:px-5 pt-3">
           {/* Center Feed Column */}
           <div className={useWideContent ? "flex-1 min-w-0 max-w-[900px]" : "flex-1 min-w-0 max-w-[var(--feed-max-width)]"}>

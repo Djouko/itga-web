@@ -49,6 +49,36 @@ body {
 html {
   font-size: 14px;
   scroll-behavior: smooth;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+main,
+section,
+article,
+aside,
+header,
+footer,
+nav {
+  min-width: 0;
+}
+
+img,
+video,
+canvas,
+iframe {
+  max-width: 100%;
 }
 
 /* ─── NProgress bar colour override ─── */

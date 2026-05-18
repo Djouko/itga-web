@@ -20,6 +20,7 @@ export const translations = {
     "nav.settings": "Paramètres",
     "nav.create": "Créer",
     "nav.jobs": "Emplois",
+    "nav.more": "Plus",
     "nav.darkMode": "Mode sombre",
     "nav.lightMode": "Mode clair",
 
@@ -361,6 +362,7 @@ export const translations = {
     "nav.settings": "Settings",
     "nav.create": "Create",
     "nav.jobs": "Jobs",
+    "nav.more": "More",
     "nav.darkMode": "Dark mode",
     "nav.lightMode": "Light mode",
 
