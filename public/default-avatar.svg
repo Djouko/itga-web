@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128" role="img" aria-label="Default profile avatar">
+  <defs>
+    <linearGradient id="bg" x1="18" y1="14" x2="112" y2="118" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#2AABAB"/>
+      <stop offset="0.48" stop-color="#1D9BF0"/>
+      <stop offset="1" stop-color="#C62168"/>
+    </linearGradient>
+    <linearGradient id="shine" x1="23" y1="20" x2="105" y2="108" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.7"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0.08"/>
+    </linearGradient>
+  </defs>
+  <rect width="128" height="128" rx="64" fill="#101522"/>
+  <rect x="4" y="4" width="120" height="120" rx="60" fill="url(#bg)" opacity="0.9"/>
+  <circle cx="64" cy="51" r="23" fill="#FFFFFF" opacity="0.92"/>
+  <path d="M25 111c5.9-22.8 20.4-35 39-35s33.1 12.2 39 35c-9.6 7.8-22.4 12-39 12s-29.4-4.2-39-12Z" fill="#FFFFFF" opacity="0.92"/>
+  <path d="M24 23c17.8-13.2 53.4-14.2 76 4" stroke="url(#shine)" stroke-width="5" stroke-linecap="round" opacity="0.55"/>
+  <circle cx="99" cy="31" r="6" fill="#FFFFFF" opacity="0.45"/>
+</svg>

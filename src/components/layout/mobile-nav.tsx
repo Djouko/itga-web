@@ -1,26 +1,34 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import {
   Bell,
   Briefcase,
   Film,
   Headphones,
+  LogOut,
   MessageCircle,
+  Moon,
   MoreHorizontal,
   Newspaper,
   Plus,
   Search,
   Settings,
+  Sun,
   User,
   Users,
   X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useTranslation, useUIStore } from "@/lib/store";
+import { useAuthStore, useThemeStore, useTranslation, useUIStore } from "@/lib/store";
 import type { TranslationKey } from "@/lib/i18n";
+import { auth } from "@/lib/firebase";
+import { signOut } from "firebase/auth";
+import { UserService } from "@/lib/services/user-service";
+import { clearApiAuthToken } from "@/lib/api-auth-token";
+import { disableCompanyActingMode } from "@/lib/company-acting";
 
 type MobileNavItem = {
   href: string;
@@ -51,7 +59,10 @@ function isActivePath(pathname: string, href: string) {
 
 export function MobileNav() {
   const pathname = usePathname();
+  const router = useRouter();
   const { t } = useTranslation();
+  const { user, logout } = useAuthStore();
+  const { mode: themeMode, setMode: setThemeMode } = useThemeStore();
   const notifCount = useUIStore((s) => s.notifCount);
   const [moreOpen, setMoreOpen] = useState(false);
 
@@ -65,6 +76,32 @@ export function MobileNav() {
   );
 
   const isMoreActive = secondaryItems.some((item) => isActivePath(pathname, item.href));
+
+  const toggleTheme = () => {
+    setThemeMode(themeMode === "dark" ? "light" : "dark");
+  };
+
+  const handleLogout = async () => {
+    if (user) {
+      try {
+        await UserService.logOut(user.id);
+      } catch {
+        /* keep logout usable even if the API is temporarily unreachable */
+      }
+    }
+
+    try {
+      await signOut(auth);
+    } catch {
+      /* Firebase may already be signed out */
+    }
+
+    clearApiAuthToken();
+    disableCompanyActingMode();
+    logout();
+    setMoreOpen(false);
+    router.push("/auth");
+  };
 
   useEffect(() => {
     if (!moreOpen) return;
@@ -86,6 +123,7 @@ export function MobileNav() {
       <div
         className={cn(
           "fixed left-3 right-3 z-50 rounded-[22px] border border-white/10 bg-[#0d1117]/95 p-3 shadow-[0_22px_70px_rgba(0,0,0,0.34)] backdrop-blur-2xl transition-all duration-200 lg:hidden",
+          "max-h-[calc(100dvh-110px)] overflow-y-auto overscroll-contain",
           moreOpen
             ? "bottom-[calc(78px+env(safe-area-inset-bottom,0px))] translate-y-0 opacity-100"
             : "pointer-events-none bottom-[calc(72px+env(safe-area-inset-bottom,0px))] translate-y-3 opacity-0"
@@ -137,6 +175,30 @@ export function MobileNav() {
               </Link>
             );
           })}
+        </div>
+
+        <div className="mt-3 grid grid-cols-2 gap-2 border-t border-white/[0.08] pt-3">
+          <button
+            type="button"
+            onClick={toggleTheme}
+            className="flex min-h-12 items-center justify-center gap-2 rounded-2xl border border-white/[0.14] bg-white/[0.075] px-3 text-sm font-bold text-white transition-all active:scale-[0.98]"
+          >
+            <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-white/[0.1] text-white/[0.9]">
+              {themeMode === "dark" ? <Sun size={17} /> : <Moon size={17} />}
+            </span>
+            <span className="truncate">{themeMode === "dark" ? t("nav.lightMode") : t("nav.darkMode")}</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="flex min-h-12 items-center justify-center gap-2 rounded-2xl border border-red/[0.24] bg-red/[0.12] px-3 text-sm font-bold text-white transition-all active:scale-[0.98]"
+          >
+            <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-red/[0.18] text-white">
+              <LogOut size={17} />
+            </span>
+            <span className="truncate">{t("settings.logout")}</span>
+          </button>
         </div>
       </div>
 

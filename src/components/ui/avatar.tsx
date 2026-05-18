@@ -4,6 +4,8 @@ import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { useState } from "react";
 
+const DEFAULT_AVATAR_SRC = "/default-avatar.svg";
+
 interface AvatarProps {
   src: string | null | undefined;
   alt: string;
@@ -15,39 +17,34 @@ interface AvatarProps {
 
 export function Avatar({ src, alt, size = 40, className, isVerified, onClick }: AvatarProps) {
   const [hasError, setHasError] = useState(false);
-  const initials = alt
-    .split(" ")
-    .map((w) => w[0])
-    .join("")
-    .slice(0, 2)
-    .toUpperCase();
+  const imageSrc = src && !hasError ? src : DEFAULT_AVATAR_SRC;
 
   return (
     <div
-      className={cn("relative inline-flex shrink-0 overflow-visible rounded-full", className)}
+      className={cn("relative inline-flex shrink-0 rounded-full", onClick && "cursor-pointer", className)}
       style={{ width: size, height: size }}
       onClick={onClick}
+      onKeyDown={(event) => {
+        if (!onClick || (event.key !== "Enter" && event.key !== " ")) return;
+        event.preventDefault();
+        onClick();
+      }}
       role={onClick ? "button" : undefined}
+      tabIndex={onClick ? 0 : undefined}
     >
-      {src && !hasError ? (
+      <span className="relative block h-full w-full overflow-hidden rounded-full bg-primary/10 ring-1 ring-border/20">
         <Image
-          src={src}
+          src={imageSrc}
           alt={alt}
-          width={size}
-          height={size}
-          className="block rounded-full object-cover"
-          style={{ width: size, height: size, minWidth: size, minHeight: size }}
-          onError={() => setHasError(true)}
+          fill
+          sizes={`${size}px`}
+          className="object-cover"
+          onError={() => {
+            if (imageSrc !== DEFAULT_AVATAR_SRC) setHasError(true);
+          }}
           unoptimized
         />
-      ) : (
-        <div
-          className="rounded-full bg-primary/15 flex items-center justify-center text-primary font-bold"
-          style={{ width: size, height: size, fontSize: size * 0.36 }}
-        >
-          {initials || "?"}
-        </div>
-      )}
+      </span>
       {isVerified && (
         <div
           className="absolute -bottom-0.5 -right-0.5 bg-card rounded-sm flex items-center justify-center"
