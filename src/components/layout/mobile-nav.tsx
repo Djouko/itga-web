@@ -80,7 +80,7 @@ export function MobileNav() {
   return (
     <>
       {moreOpen && (
-        <div className="fixed inset-0 z-40 bg-black/35 backdrop-blur-[2px]" onClick={() => setMoreOpen(false)} />
+        <div className="fixed inset-0 z-40 bg-black/[0.35] backdrop-blur-[2px]" onClick={() => setMoreOpen(false)} />
       )}
 
       <div
@@ -95,12 +95,12 @@ export function MobileNav() {
       >
         <div className="mb-3 flex items-center justify-between">
           <div>
-            <p className="text-[11px] font-black uppercase tracking-[0.18em] text-white/45">{t("nav.more")}</p>
+            <p className="text-[11px] font-black uppercase tracking-[0.18em] text-white/[0.55]">{t("nav.more")}</p>
             <p className="text-sm font-bold text-white">ITGA</p>
           </div>
           <button
             type="button"
-            className="flex h-9 w-9 items-center justify-center rounded-full bg-white/8 text-white/70 transition-colors active:scale-95"
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-white/[0.08] text-white/70 transition-colors active:scale-95"
             onClick={() => setMoreOpen(false)}
             aria-label="Fermer"
           >
@@ -121,14 +121,14 @@ export function MobileNav() {
                 className={cn(
                   "relative flex min-h-[72px] flex-col items-center justify-center gap-1 rounded-2xl border text-center transition-all active:scale-[0.98]",
                   active
-                    ? "border-primary/45 bg-primary/18 text-white shadow-[0_10px_24px_rgba(42,171,171,0.18)]"
-                    : "border-white/8 bg-white/[0.055] text-white/68"
+                    ? "border-primary/[0.55] bg-primary/[0.22] text-white shadow-[0_10px_24px_rgba(42,171,171,0.18)]"
+                    : "border-white/[0.14] bg-white/[0.075] text-white/[0.9]"
                 )}
               >
-                <span className={cn("flex h-8 w-8 items-center justify-center rounded-xl", active ? "bg-primary text-white" : "bg-white/8")}>
-                  <Icon size={17} strokeWidth={active ? 2.3 : 1.8} />
+                <span className={cn("flex h-8 w-8 items-center justify-center rounded-xl", active ? "bg-primary text-white" : "bg-white/[0.1] text-white/[0.88]")}>
+                  <Icon size={17} strokeWidth={active ? 2.3 : 1.8} className={active ? "text-white" : "text-white/[0.88]"} />
                 </span>
-                <span className="max-w-full px-1 text-[11px] font-bold leading-tight">{t(item.labelKey)}</span>
+                <span className="max-w-full px-1 text-[11px] font-bold leading-tight text-white">{t(item.labelKey)}</span>
                 {!!item.badge && item.badge > 0 && (
                   <span className="absolute right-2 top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-magenta px-1 text-[10px] font-black text-white">
                     {item.badge > 99 ? "99+" : item.badge}
@@ -171,8 +171,8 @@ export function MobileNav() {
             aria-label={t("nav.more")}
           >
             <span className={cn("h-1 w-1 rounded-full", isMoreActive || moreOpen ? "bg-primary" : "bg-transparent")} />
-            <MoreHorizontal size={22} strokeWidth={isMoreActive || moreOpen ? 2.1 : 1.55} className={cn(isMoreActive || moreOpen ? "text-white" : "text-text-light/55")} />
-            <span className={cn("max-w-full truncate px-0.5", isMoreActive || moreOpen ? "font-semibold text-white" : "font-normal text-text-light/55")}>{t("nav.more")}</span>
+            <MoreHorizontal size={22} strokeWidth={isMoreActive || moreOpen ? 2.1 : 1.55} className={cn(isMoreActive || moreOpen ? "text-white" : "text-text-light/[0.65]")} />
+            <span className={cn("max-w-full truncate px-0.5", isMoreActive || moreOpen ? "font-semibold text-white" : "font-normal text-text-light/[0.65]")}>{t("nav.more")}</span>
             {notifCount > 0 && (
               <span className="absolute right-1 top-0 flex h-5 min-w-5 items-center justify-center rounded-full bg-magenta px-1 text-[10px] font-black text-white">
                 {notifCount > 99 ? "99+" : notifCount}
@@ -195,9 +195,9 @@ function MobileNavLink({ item, pathname, label }: { item: MobileNavItem; pathnam
       <Icon
         size={22}
         strokeWidth={active ? 2.1 : 1.55}
-        className={cn("transition-all duration-200", active ? "scale-105 text-white" : "text-text-light/55")}
+        className={cn("transition-all duration-200", active ? "scale-105 text-white" : "text-text-light/[0.65]")}
       />
-      <span className={cn("max-w-full truncate px-0.5 text-[10px] transition-colors duration-200", active ? "font-semibold text-white" : "font-normal text-text-light/55")}>
+      <span className={cn("max-w-full truncate px-0.5 text-[10px] transition-colors duration-200", active ? "font-semibold text-white" : "font-normal text-text-light/[0.65]")}>
         {label}
       </span>
     </Link>
